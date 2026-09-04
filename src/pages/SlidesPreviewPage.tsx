@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import SlidesDeckCard, { type SlideDeck } from "@/components/chat/SlidesDeckCard";
 import { readSlidesDeckForPreview } from "@/lib/slidesPreviewStore";
+import { Button } from "@/components/ui/button";
 
 const SlidesPreviewPage = () => {
   const { id = "" } = useParams();
@@ -25,13 +26,13 @@ const SlidesPreviewPage = () => {
     return (
       <div className="fixed inset-0 flex flex-col items-center justify-center gap-4 bg-background text-foreground">
         <p className="text-sm opacity-80">Preview not available. Please regenerate the deck.</p>
-        <button
+        <Button
           onClick={() => navigate("/")}
-          style={{ backgroundColor: "#ffffff", color: "#000000" }}
-          className="px-5 py-2.5 rounded-full font-semibold text-sm"
+          variant="neutral"
+          className="rounded-full px-5"
         >
           Back to chat
-        </button>
+        </Button>
       </div>
     );
   }

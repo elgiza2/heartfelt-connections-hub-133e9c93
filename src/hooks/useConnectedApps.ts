@@ -21,7 +21,7 @@ export function useConnectedApps() {
   useEffect(() => {
     let cancelled = false;
 
-    (async () => {
+    const load = async () => {
       try {
         const auth = { user: await getCachedUser() };
         const user = auth?.user;
@@ -61,10 +61,15 @@ export function useConnectedApps() {
       } catch {
         /* silent — composer just shows the generic integrations icon */
       }
-    })();
+    };
+
+    void load();
+    const refresh = () => void load();
+    window.addEventListener("megsy:integrations-changed", refresh);
 
     return () => {
       cancelled = true;
+      window.removeEventListener("megsy:integrations-changed", refresh);
     };
   }, []);
 

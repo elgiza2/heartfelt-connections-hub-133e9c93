@@ -3,6 +3,7 @@ import { memo, useEffect, useState } from "react";
 import { m as motion } from "framer-motion";
 import { CreditCard, Smartphone, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useUserLang } from "@/lib/authI18n";
 
 import { IOS_SPRING as iosSpring } from "@/pages/chat/constants/motion";
 
@@ -59,6 +60,13 @@ function PaymentGatewaySheetImpl({
   labels,
 }: Props) {
   useIsLightTheme();
+  const lang = useUserLang();
+  const isArabic = lang.startsWith("ar");
+  const resolvedTitle = title === "Choose payment method" && isArabic ? "اختر طريقة الدفع" : title;
+  const resolvedSubtitle = subtitle === "Pick an option." && isArabic ? "اختر الطريقة المناسبة لك." : subtitle;
+  const localizedLabels: Partial<Record<PayOption, string>> = isArabic
+    ? { global: "دفع دولي", local: "بطاقة بنكية", wallets: "محفظة إلكترونية" }
+    : {};
 
   useEffect(() => {
     if (!open) return;
@@ -75,7 +83,7 @@ function PaymentGatewaySheetImpl({
 
   return (
     <div
-      dir="ltr"
+      dir={isArabic ? "rtl" : "ltr"}
       className="fixed inset-0 z-[100] flex items-end justify-center bg-foreground/25 sm:items-center"
     >
       <div
@@ -97,8 +105,8 @@ function PaymentGatewaySheetImpl({
         </div>
 
         <div className="px-1 pt-1 pb-3">
-          <p className="text-sm font-semibold leading-none">{title}</p>
-          <p className="mt-1 text-xs leading-snug text-muted-foreground">{subtitle}</p>
+          <p className="text-sm font-semibold leading-none">{resolvedTitle}</p>
+          <p className="mt-1 text-xs leading-snug text-muted-foreground">{resolvedSubtitle}</p>
         </div>
 
         <div className="flex flex-col overflow-hidden rounded-lg border border-border bg-card">
@@ -119,7 +127,7 @@ function PaymentGatewaySheetImpl({
                   {row.id === "wallets" ? <Smartphone className="h-4 w-4" /> : <CreditCard className="h-4 w-4" />}
                 </span>
                 <span className="flex-1 text-sm font-medium leading-tight">
-                  {labels?.[row.id] ?? row.label}
+                  {labels?.[row.id] ?? localizedLabels[row.id] ?? row.label}
                 </span>
                 {isLoading ? (
                   <Loader2 className="h-4 w-4 shrink-0 animate-spin text-muted-foreground" />

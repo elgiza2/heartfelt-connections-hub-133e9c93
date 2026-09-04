@@ -137,24 +137,22 @@ export function DesktopSettingsLayout({
         </div>
 
         <div className="relative z-10 h-full w-full flex">
-          {isSettingsHome && (
-            <aside
-              data-app-sidebar="true"
-              className="theme-fixed relative z-40 hidden md:flex shrink-0 overflow-hidden border-e border-transparent"
-              style={{ width: 260, minWidth: 260, flexBasis: 260, backgroundColor: "transparent" }}
-            >
-              <AppSidebar
-                inline
-                open
-                forceExpanded
-                onClose={() => {}}
-                onNewChat={() => go("/chat")}
-                onSelectConversation={(id) => navigate(`/chat?c=${id}`)}
-                activeConversationId={null}
-                currentMode="chat"
-              />
-            </aside>
-          )}
+          <aside
+            data-app-sidebar="true"
+            className="theme-fixed relative z-40 hidden md:flex shrink-0 overflow-hidden border-e border-transparent"
+            style={{ width: 260, minWidth: 260, flexBasis: 260, backgroundColor: "transparent" }}
+          >
+            <AppSidebar
+              inline
+              open
+              forceExpanded
+              onClose={() => {}}
+              onNewChat={() => go("/chat")}
+              onSelectConversation={(id) => navigate(`/chat?c=${id}`)}
+              activeConversationId={null}
+              currentMode="chat"
+            />
+          </aside>
 
           {/* Main */}
           <div className="flex-1 overflow-y-auto bg-transparent">

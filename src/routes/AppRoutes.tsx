@@ -77,9 +77,9 @@ const toPricing = <RetiredRedirect to="/pricing" />;
 export const AppRoutes = ({ currentUserId }: { currentUserId: string | null }) => (
   <>
     {/* ── Entry ──────────────────────────────────────────────── */}
-    <Route path="/" element={<ChatPage key={currentUserId} />} />
-    <Route path="/chat" element={<ChatPage key={currentUserId} />} />
-    <Route path="/index" element={<ChatPage key={currentUserId} />} />
+    <Route path="/" element={<ChatPage />} />
+    <Route path="/chat" element={<ChatPage />} />
+    <Route path="/index" element={<ChatPage />} />
     <Route path="/share/:shareId" element={<SharedChatPage />} />
 
     {/* ── Auth hub — one page, animated inner views ──────────── */}
