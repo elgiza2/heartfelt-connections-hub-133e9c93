@@ -708,40 +708,34 @@ const SlidesDeckCard = ({ deck, hideCard = false, autoOpen = false, onClose }: P
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <header className="flex items-center justify-between px-4 py-3 gap-2">
-              <div className="flex items-center gap-3 min-w-0">
-                <span className="text-xs font-mono text-foreground/60">
-                  {idx + 1} / {total}
-                </span>
-                <span className="text-sm font-semibold text-foreground truncate">{deck.title}</span>
-              </div>
-              <div className="flex items-center gap-1.5 shrink-0">
-                <div className="flex items-center rounded-full bg-foreground/10 p-0.5">
-                  <button
-                    onClick={() => setOrientation("horizontal")}
-                    aria-label="Horizontal scroll"
-                    title="Horizontal"
-                    className={`h-8 px-2.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition ${orientation === "horizontal" ? "bg-foreground/10 text-foreground" : "text-foreground/70 hover:text-foreground"}`}
-                  >
-                    <MoveHorizontal className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={() => setOrientation("vertical")}
-                    aria-label="Vertical scroll"
-                    title="Vertical"
-                    className={`h-8 px-2.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition ${orientation === "vertical" ? "bg-foreground/10 text-foreground" : "text-foreground/70 hover:text-foreground"}`}
-                  >
-                    <MoveVertical className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-                <button
-                  onClick={closePreview}
-                  className="h-9 w-9 rounded-full bg-foreground/10 hover:bg-foreground/20 text-foreground flex items-center justify-center"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </header>
+            {/* Floating circular back button — the only header control. */}
+            <button
+              onClick={closePreview}
+              aria-label="Back"
+              className="fixed top-[calc(env(safe-area-inset-top)+12px)] left-4 z-20 h-10 w-10 rounded-full bg-foreground/10 backdrop-blur hover:bg-foreground/20 text-foreground flex items-center justify-center"
+            >
+              <ArrowLeft className="w-4.5 h-4.5" />
+            </button>
+            {/* Scroll-direction toggle — floating, not part of a header/title bar. */}
+            <div className="fixed top-[calc(env(safe-area-inset-top)+12px)] right-4 z-20 flex items-center rounded-full bg-foreground/10 backdrop-blur p-0.5">
+              <button
+                onClick={() => setOrientation("horizontal")}
+                aria-label="Horizontal scroll"
+                title="Horizontal"
+                className={`h-8 px-2.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition ${orientation === "horizontal" ? "bg-foreground/10 text-foreground" : "text-foreground/70 hover:text-foreground"}`}
+              >
+                <MoveHorizontal className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => setOrientation("vertical")}
+                aria-label="Vertical scroll"
+                title="Vertical"
+                className={`h-8 px-2.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition ${orientation === "vertical" ? "bg-foreground/10 text-foreground" : "text-foreground/70 hover:text-foreground"}`}
+              >
+                <MoveVertical className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <div className="h-[calc(env(safe-area-inset-top)+56px)] shrink-0" aria-hidden />
 
             {orientation === "horizontal" ? (
               <div className="flex-1 flex items-center justify-center px-3 sm:px-10 pb-4 relative">
@@ -752,7 +746,7 @@ const SlidesDeckCard = ({ deck, hideCard = false, autoOpen = false, onClose }: P
                 >
                   <ChevronLeft />
                 </button>
-                <div className="relative w-full max-w-5xl aspect-[16/9] rounded-2xl overflow-hidden">
+                <div className={`relative w-full ${portrait ? "max-w-md aspect-[9/16]" : "max-w-5xl aspect-[16/9]"} rounded-2xl overflow-hidden`}>
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={idx}
@@ -762,8 +756,8 @@ const SlidesDeckCard = ({ deck, hideCard = false, autoOpen = false, onClose }: P
                       transition={{ duration: 0.25 }}
                       className="absolute inset-0"
                     >
-                      <ScaledSlide>
-                        <SlideRender slide={deck.slides[idx]} palette={deck.palette} dir={dir} />
+                      <ScaledSlide portrait={portrait}>
+                        <SlideRender slide={deck.slides[idx]} palette={deck.palette} dir={dir} portrait={portrait} />
                       </ScaledSlide>
                     </motion.div>
                   </AnimatePresence>
@@ -789,10 +783,10 @@ const SlidesDeckCard = ({ deck, hideCard = false, autoOpen = false, onClose }: P
                       ref={(el) => {
                         slideRefs.current[i] = el;
                       }}
-                      className="w-full max-w-5xl aspect-[16/9] rounded-2xl overflow-hidden snap-center shrink-0"
+                      className={`w-full ${portrait ? "max-w-md aspect-[9/16]" : "max-w-5xl aspect-[16/9]"} rounded-2xl overflow-hidden snap-center shrink-0`}
                     >
-                      <ScaledSlide>
-                        <SlideRender slide={s} palette={deck.palette} dir={dir} />
+                      <ScaledSlide portrait={portrait}>
+                        <SlideRender slide={s} palette={deck.palette} dir={dir} portrait={portrait} />
                       </ScaledSlide>
                     </div>
                   ))}
@@ -823,6 +817,43 @@ const SlidesDeckCard = ({ deck, hideCard = false, autoOpen = false, onClose }: P
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Bottom bar — always visible, Download + portrait/landscape toggle. */}
+            <div
+              className="shrink-0 flex items-center justify-center gap-3 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+1rem)] border-t border-foreground/10"
+              style={{
+                background: "hsl(var(--foreground) / 0.09)",
+                backdropFilter: "blur(22px) saturate(180%) brightness(1.06)",
+                WebkitBackdropFilter: "blur(22px) saturate(180%) brightness(1.06)",
+              }}
+            >
+              <button
+                type="button"
+                onClick={handlePptx}
+                disabled={exportingPptx}
+                className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-full text-sm font-semibold tracking-wide transition bg-foreground text-background hover:bg-foreground/90 disabled:opacity-50"
+              >
+                {exportingPptx ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Download className="w-4 h-4" />
+                )}
+                Download
+              </button>
+              <button
+                type="button"
+                onClick={() => setPortrait((p) => !p)}
+                aria-label={portrait ? "Switch to landscape" : "Switch to portrait"}
+                className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-full text-sm font-semibold tracking-wide transition bg-foreground/10 hover:bg-foreground/18 text-foreground border border-foreground/10"
+              >
+                {portrait ? (
+                  <RectangleHorizontal className="w-4 h-4" />
+                ) : (
+                  <RectangleVertical className="w-4 h-4" />
+                )}
+                {portrait ? "Landscape" : "Portrait"}
+              </button>
             </div>
           </motion.div>
         )}
