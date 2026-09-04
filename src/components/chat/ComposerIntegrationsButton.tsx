@@ -31,10 +31,8 @@ export function ComposerIntegrationsButton({ onClick, label = "Integrations" }: 
       return () => window.cancelIdleCallback(idleId);
     }
 
-    const timeoutId = window.setTimeout(prefetchIntegrationsSheet, 300);
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
+    const timeoutId: number = globalThis.setTimeout(prefetchIntegrationsSheet, 300);
+    return () => globalThis.clearTimeout(timeoutId);
   }, []);
 
   return (
