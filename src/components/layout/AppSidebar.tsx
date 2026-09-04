@@ -1001,30 +1001,30 @@ const AppSidebar = ({
       data-section={sectionAccent.name}
     >
       <div
-        className="relative shrink-0 px-4 pb-2 flex items-center gap-2"
-        style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + var(--pwa-extra-top, 0px) + 1rem)" }}
-      >
-        <BrandLogo
-          alt=""
-          width={22}
-          height={22}
-          className="h-[22px] w-[22px] shrink-0"
-          loading="eager"
-          decoding="async"
-        />
-        <BrandWord
-          className="text-[19px] tracking-tight truncate"
-          style={{ fontWeight: 900, letterSpacing: "-0.02em" }}
-        >
-          Megsy
-        </BrandWord>
-      </div>
-
-      <div
         onScroll={(e) => setMobileScrolled((e.currentTarget as HTMLDivElement).scrollTop > 6)}
-        className="relative flex-1 overflow-y-auto px-3 pt-1 pb-32 min-h-0 [scrollbar-width:thin]"
+        className="relative flex-1 overflow-y-auto px-3 pb-32 min-h-0 [scrollbar-width:thin]"
+        style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + var(--pwa-extra-top, 0px) + 0.5rem)" }}
       >
+        {/* Brand header scrolls with the list — it is not pinned. */}
+        <div className="mb-3 flex items-center gap-2 px-1 pt-2">
+          <BrandLogo
+            alt=""
+            width={22}
+            height={22}
+            className="h-[22px] w-[22px] shrink-0"
+            loading="eager"
+            decoding="async"
+          />
+          <BrandWord
+            className="text-[19px] tracking-tight truncate"
+            style={{ fontWeight: 900, letterSpacing: "-0.02em" }}
+          >
+            Megsy
+          </BrandWord>
+        </div>
+
         <div className="space-y-1 mb-3">
+
           {primaryNav.map(({ label, Icon, path, match }) => {
             const active = match(currentAppPath);
             return (
