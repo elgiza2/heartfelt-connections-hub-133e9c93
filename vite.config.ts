@@ -536,13 +536,13 @@ function deepResearchDevPlugin(): Plugin {
     configureServer(server: ViteDevServer) {
       // `.env` is not loaded into process.env by Vite, so pick up the
       // server-only provider key here for preview parity with production
-      // (mirrors chatProxyDevPlugin's ABLITERATION_API_KEY fallback below).
-      if (!process.env.LOVABLE_API_KEY) {
+      // (same key as chatProxyDevPlugin below — abliteration.ai).
+      if (!process.env.ABLITERATION_API_KEY) {
         try {
           const match = fs
             .readFileSync(path.resolve(__dirname, ".env"), "utf8")
-            .match(/^LOVABLE_API_KEY=(.*)$/m);
-          if (match) process.env.LOVABLE_API_KEY = match[1].trim();
+            .match(/^ABLITERATION_API_KEY=(.*)$/m);
+          if (match) process.env.ABLITERATION_API_KEY = match[1].trim();
         } catch {
           /* no .env in this environment */
         }
@@ -569,17 +569,18 @@ function deepResearchDevPlugin(): Plugin {
           } catch {
             payload = null;
           }
-          if (!process.env.LOVABLE_API_KEY) {
+          if (!process.env.ABLITERATION_API_KEY && !process.env.VITE_ABLITERATION_API_KEY) {
             res.statusCode = 500;
             res.setHeader("Content-Type", "application/json");
             res.end(
               JSON.stringify({
-                error: "Deep Research is not configured: missing LOVABLE_API_KEY.",
-                missingEnv: "LOVABLE_API_KEY",
+                error: "Deep Research is not configured: missing ABLITERATION_API_KEY.",
+                missingEnv: "ABLITERATION_API_KEY",
               }),
             );
             return;
           }
+
           try {
             const { streamDeepResearch } = await import("./src/lib/research/deepResearchCore");
             const response = await streamDeepResearch(payload ?? {});
