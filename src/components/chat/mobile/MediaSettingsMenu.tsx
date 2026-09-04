@@ -82,17 +82,9 @@ export default function MediaSettingsMenu({ mode, open, onOpenChange, onChange }
         <button
           type="button"
           aria-label={translateExactText("Generation settings", lang)}
-          className="inline-flex h-9 items-center gap-2 rounded-full pl-1 pr-3 text-[12.5px] font-semibold text-foreground border border-foreground/15 transition"
-          style={{
-            background: "hsl(var(--foreground) / 0.09)",
-            backdropFilter: "blur(18px) saturate(170%)",
-            boxShadow: "inset 1px 1px 1px 0 hsl(var(--foreground) / 0.22)",
-          }}
+          className="inline-flex h-9 items-center gap-2 rounded-full pl-1 pr-3 text-[12.5px] font-semibold text-foreground bg-muted border border-border transition hover:bg-muted/80"
         >
-          <span
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-foreground/15"
-            style={{ background: "hsl(var(--foreground) / 0.12)" }}
-          >
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-background border border-border">
             <Settings2 className="h-3.5 w-3.5 text-foreground/85" />
           </span>
           <span className="tracking-tight">{translateExactText("Settings", lang)}</span>
@@ -214,17 +206,9 @@ export function MediaSettingsPanel({
                 onClick={() => update({ aspectRatio: r.id })}
                 className={`flex flex-col items-center justify-center gap-1 h-[58px] rounded-2xl border transition-all ${
                   active
-                    ? "border-foreground/25 text-foreground"
-                    : "border-foreground/10 text-foreground/60"
+                    ? "border-border bg-popover text-foreground shadow-sm"
+                    : "border-transparent bg-muted text-foreground/60"
                 }`}
-                style={
-                  active
-                    ? {
-                        background: "hsl(var(--foreground) / 0.16)",
-                        boxShadow: "inset 1px 1px 1px 0 hsl(var(--foreground) / 0.22)",
-                      }
-                    : { background: "hsl(var(--foreground) / 0.05)" }
-                }
               >
                 <span
                   className={`rounded-[3px] border-2 ${active ? "border-foreground/70" : "border-foreground/35"}`}
@@ -394,17 +378,9 @@ function Segmented({
             onClick={() => onChange(it.id)}
             className={`flex-1 h-8 inline-flex items-center justify-center rounded-lg text-[12px] font-semibold transition-all ${
               active
-                ? "text-foreground border border-foreground/20"
+                ? "text-foreground bg-popover border border-border shadow-sm"
                 : "text-foreground/55 hover:text-foreground/85"
             }`}
-            style={
-              active
-                ? {
-                    background: "hsl(var(--foreground) / 0.16)",
-                    boxShadow: "inset 1px 1px 1px 0 hsl(var(--foreground) / 0.22)",
-                  }
-                : undefined
-            }
           >
             {it.label}
           </button>
