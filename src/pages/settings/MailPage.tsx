@@ -595,6 +595,7 @@ export default function MailPage() {
             style={{ paddingTop: "max(env(safe-area-inset-top), 12px)" }}
           >
             <MobileSidebarButton
+              edge
               onClick={() => setSidebarOpen(true)}
               ariaLabel={tx("Open menu")}
               className="relative shrink-0"

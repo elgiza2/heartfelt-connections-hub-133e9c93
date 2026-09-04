@@ -6,7 +6,7 @@ import { useUserLang } from "@/lib/authI18n";
 const RTL_UI_LANGS = new Set(["ar", "ar-eg", "he", "fa"]);
 const CLOSE_SNAP = 0.64;
 const FLING_VELOCITY = 520;
-const PUSH_SPRING = { type: "spring" as const, stiffness: 420, damping: 42, mass: 0.8 };
+const PUSH_SPRING = { type: "spring" as const, stiffness: 300, damping: 38, mass: 0.95 };
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 

@@ -333,16 +333,12 @@ const PricingPage = () => {
       // Kashier: server-side catalog decides amount/credits/plan. We only
       // pass a sku that matches public.billing_skus.
       if (provider === "kashier") {
-        // Map (tier, interval) → sku. Extend billing_skus + this map when
-        // adding new plans.
-        // Pro monthly gets the special first-month offer sku ($7 → 344 EGP).
+        // Kashier currently supports the local monthly plans. Yearly and
+        // business purchases stay unavailable until matching catalog items
+        // exist server-side, so checkout can never open with an invalid SKU.
         const skuMap: Record<string, string> = {
           "pro:monthly":       "plan_pro_m_first",
-          "pro:yearly":        "plan_pro_y",
           "elite:monthly":     "plan_elite_m",
-          "elite:yearly":      "plan_elite_y",
-          "business:monthly":  "plan_business_m",
-          "business:yearly":   "plan_business_y",
         };
         const sku = skuMap[`${tier}:${interval}`];
         if (!sku) {
@@ -701,7 +697,7 @@ const PricingPage = () => {
         {/* Hero content */}
         <div className="relative z-10 flex flex-1 flex-col items-center justify-center text-center px-5 sm:px-8 pt-4 sm:pt-6 pb-6 sm:pb-8">
           <h1
-            className="font-garamond font-normal text-foreground tracking-tight mb-4 sm:mb-6 text-4xl sm:text-6xl md:text-8xl lg:text-9xl"
+            className="font-garamond font-normal text-foreground tracking-normal mb-4 sm:mb-5 text-4xl sm:text-5xl md:text-6xl lg:text-7xl"
             style={{ lineHeight: 1.08 }}
           >
             <StaggeredFade text="CHOOSE YOUR" className="block" />

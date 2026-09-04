@@ -69,10 +69,9 @@ Deno.serve(async (req) => {
   if (!skuInfo) return json({ error: "unknown sku" }, 400);
 
   const merchantId = Deno.env.get("KASHIER_MERCHANT_ID");
-  const apiKey = Deno.env.get("KASHIER_API_KEY");
   const secret = Deno.env.get("KASHIER_SECRET");
-  if (!merchantId || !apiKey || !secret) {
-    return json({ error: "Kashier is not configured (missing KASHIER_MERCHANT_ID / KASHIER_API_KEY / KASHIER_SECRET)" }, 503);
+  if (!merchantId || !secret) {
+    return json({ error: "Kashier is not configured (missing KASHIER_MERCHANT_ID / KASHIER_SECRET)" }, 503);
   }
 
   const orderId = `ord_${crypto.randomUUID()}`;
@@ -97,7 +96,7 @@ Deno.serve(async (req) => {
   const hash = await hmacHex(secret, path);
 
   const siteUrl = Deno.env.get("SITE_URL") || "https://megsyai.com";
-  const redirectUrl = `${siteUrl}/billing/kashier-callback`;
+  const redirectUrl = `${siteUrl}/billing/success?provider=kashier&order=${encodeURIComponent(orderId)}`;
 
   const params = new URLSearchParams({
     merchantId,
