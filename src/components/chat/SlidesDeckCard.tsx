@@ -4,7 +4,7 @@ import { useNavigate, useInRouterContext } from "react-router-dom";
 import {
   ChevronLeft,
   ChevronRight,
-  X,
+  ArrowLeft,
   Maximize2,
   Download,
   Loader2,
@@ -12,6 +12,8 @@ import {
   FileType2,
   MoveHorizontal,
   MoveVertical,
+  RectangleVertical,
+  RectangleHorizontal,
 } from "lucide-react";
 import { toast } from "sonner";
 import { exportDeckHtml, exportDeckPptx } from "@/lib/slidesExport";
@@ -549,6 +551,7 @@ const SlidesDeckCard = ({ deck, hideCard = false, autoOpen = false, onClose }: P
 
   const [idx, setIdx] = useState(0);
   const [orientation, setOrientation] = useState<"horizontal" | "vertical">("horizontal");
+  const [portrait, setPortrait] = useState(false);
   const verticalScrollRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
 
