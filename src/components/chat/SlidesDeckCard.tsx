@@ -14,6 +14,8 @@ import {
   MoveVertical,
   RectangleVertical,
   RectangleHorizontal,
+  X,
+
 } from "lucide-react";
 import { toast } from "sonner";
 import { exportDeckHtml, exportDeckPptx } from "@/lib/slidesExport";
