@@ -225,6 +225,8 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
   let assistantToolParts: ToolPart[] = [];
   let researchSources: WebSource[] = [];
   const researchTrace: string[] = [];
+  let researchStepId: string | undefined;
+  let researchErrorMessage: string | undefined;
   const streamStartedAt = Date.now();
   let firstTokenAt: number | null = null;
   const sanitizeStreamChunk = makeLeakedToolStreamSanitizer();
@@ -291,6 +293,10 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
       }));
     }
     if (isDeepResearch && researchTrace.length > 0) metadata.researchTrace = researchTrace.slice(-40);
+    if (isDeepResearch) {
+      metadata.researchStatus = hadStreamError ? "error" : "done";
+      if (hadStreamError && researchErrorMessage) metadata.researchErrorMessage = researchErrorMessage;
+    }
     if (generatedVideos.length > 0) metadata.videos = generatedVideos;
     if (generatedAudios.length > 0) metadata.audios = generatedAudios;
     if (selectedModel?.label) metadata.modelLabel = selectedModel.label;
@@ -551,6 +557,18 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
                 return true;
               })
               .slice(0, 80);
+          },
+          onStep: (stepId) => {
+            researchStepId = stepId;
+            updateAssistantMessage((message) => ({
+              ...message,
+              metadata: {
+                ...(message.metadata || {}),
+                kind: "deepResearch",
+                researchStatus: "running",
+                researchStepId: stepId,
+              },
+            }));
           },
           signal,
         });
@@ -1453,6 +1471,14 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
       }
     },
     onError: (err) => {
+      // Deep Research failures should surface directly as a retryable error
+      // card (DeepResearchCard) rather than being handed off to the generic
+      // cloud browser-agent fallback, which has no bearing on a research run.
+      if (isDeepResearch) {
+        researchErrorMessage = err;
+        failTurnWithError(err);
+        return;
+      }
       // A failed text-model stream is not the end of the turn: the cloud
       // browser agents can answer it on their own (they bring their own model),
       // so try them before showing any error to the user.
@@ -1549,6 +1575,17 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
           event: "ai_busy",
           payload: { user_id: chatUserId, busy: false },
         });
+      }
+      if (isDeepResearch) {
+        updateAssistantMessage((message) => ({
+          ...message,
+          metadata: {
+            ...(message.metadata || {}),
+            kind: "deepResearch",
+            researchStatus: "error",
+            researchErrorMessage: researchErrorMessage || err,
+          },
+        }));
       }
       const fallbackContent =
         isDeepResearch && !assistantContent.trim()

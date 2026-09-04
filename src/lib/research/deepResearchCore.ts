@@ -1,58 +1,16 @@
-/** Server-only Deep Research proxy. The model plans, searches the live web,
- * cross-checks evidence, and writes the cited report in one streamed run. */
+/** Server-only Deep Research proxy (dev/Vite transport adapter).
+ * Prompts, depth scaling and validation live in `deepResearchShared.ts` so
+ * this stays in lockstep with `supabase/functions/deep-research/core.ts`. */
+import {
+  errorMessage,
+  researchInstructions,
+  depthScale,
+  validateResearchPayload,
+  type ResearchPayload,
+} from "./deepResearchShared";
 
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/responses";
 const RESEARCH_MODEL = "openai/gpt-5.5";
-
-type ResearchPayload = {
-  query?: string;
-  context?: string;
-  depth?: string;
-};
-
-function errorMessage(data: unknown, fallback: string): string {
-  if (!data || typeof data !== "object") return fallback;
-  const record = data as Record<string, unknown>;
-  const nested = record.error && typeof record.error === "object"
-    ? (record.error as Record<string, unknown>).message
-    : undefined;
-  return String(record.message ?? nested ?? fallback);
-}
-
-function researchInstructions(query: string, depth: string): string {
-  const Arabic = /[\u0600-\u06FF]/.test(query);
-  const scale =
-    depth === "pro"
-      ? { searches: "at least 8", words: "at least 1,800 words", sections: "5-7" }
-      : depth === "ultra8x" || depth === "ultra4x"
-        ? { searches: "at least 20", words: "at least 4,500 words", sections: "8-12" }
-        : depth === "ultra2x"
-          ? { searches: "at least 14", words: "at least 3,000 words", sections: "6-9" }
-          : { searches: "at least 10", words: "at least 2,400 words", sections: "5-8" };
-
-  const depthGuide =
-    depth === "ultra8x" || depth === "ultra4x"
-      ? "Search exhaustively from many independent angles and prioritize primary sources."
-      : depth === "ultra2x"
-        ? "Search broadly, compare conflicting accounts, and prioritize primary sources."
-        : "Search deeply enough to support every important factual claim.";
-
-  return [
-    "You are Megsy Deep Research, an autonomous research analyst.",
-    depthGuide,
-    `Run ${scale.searches} distinct live web searches before writing. Plan the investigation internally, follow promising leads, and cross-check dates, names, numbers, and disputed claims across independent sources.`,
-    "Prefer primary, official, academic, and established editorial sources. Use secondary sources only when they add necessary context.",
-    `Write a long-form, exhaustive report of ${scale.words}. A short or superficial answer is a failed task — never compress the findings into a brief summary.`,
-    `Structure the report as: a single specific editorial # title written by you (never use "Deep Research" or "بحث عميق" in it), a short descriptive standfirst, then ${scale.sections} thematic ## sections with ### subsections where useful, and a comparison table whenever items, figures, or timelines are compared. Do not number headings.`,
-    "Every section must contain specific facts: exact dates, names, numbers, quotes, and documented events. Never use generic filler, invented facts, placeholder prose, or unsupported conclusions.",
-    "Cite factual claims using the citations returned by web search. Finish with a Sources section listing every source actually used as markdown links; the reader UI will move all links and citation markers out of the prose.",
-    "When live search returns a direct, authentic, non-logo image URL that clearly depicts the exact subject, place exactly one markdown image immediately below the title. Never invent an image URL and never use a generic or decorative image.",
-    "Explicitly identify uncertainty or disagreement between sources. If evidence is insufficient, say exactly what could not be verified instead of pretending the research succeeded.",
-    "Write one single clean report. Never expose your plan, search steps, tool traces or internal status lines, never repeat the same summary twice, and never mix languages: headings, body and table cells must all be in the report language.",
-    `Write the complete report in ${Arabic ? "Arabic" : "the same language as the user's request"}.`,
-
-  ].join("\n");
-}
 
 export async function streamDeepResearch(
   payload: ResearchPayload,
@@ -60,18 +18,19 @@ export async function streamDeepResearch(
 ): Promise<Response> {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) {
-    return Response.json({ error: "Deep Research is not configured." }, { status: 500 });
+    return Response.json(
+      { error: "Deep Research is not configured: missing LOVABLE_API_KEY.", missingEnv: "LOVABLE_API_KEY" },
+      { status: 500 },
+    );
   }
 
-  const query = String(payload.query ?? "").trim();
-  const context = String(payload.context ?? "").trim();
-  const depth = String(payload.depth ?? "ultra");
-  if (query.length < 3) {
-    return Response.json({ error: "Enter a research topic." }, { status: 400 });
+  const validated = validateResearchPayload(payload);
+  if (validated.ok !== true) {
+    return Response.json({ error: validated.error }, { status: validated.status });
   }
-  if (query.length > 20_000 || context.length > 20_000) {
-    return Response.json({ error: "The research request is too large." }, { status: 400 });
-  }
+  const { query, context, depth } = validated.value;
+
+  const scale = depthScale(depth);
 
   const priorRunId = request?.headers.get("X-Lovable-AIG-Run-ID");
   const input = context
@@ -92,25 +51,10 @@ export async function streamDeepResearch(
       instructions: researchInstructions(query, depth),
       input,
       tools: [{ type: "web_search_preview" }],
-      reasoning: {
-        effort:
-          depth === "pro"
-            ? "low"
-            : depth === "ultra8x" || depth === "ultra4x"
-              ? "high"
-              : "medium",
-        summary: "auto",
-      },
+      reasoning: { effort: scale.effort, summary: "auto" },
       include: ["reasoning.encrypted_content"],
       store: false,
-      max_output_tokens:
-        depth === "pro"
-          ? 10_000
-          : depth === "ultra8x" || depth === "ultra4x"
-            ? 48_000
-            : depth === "ultra2x"
-              ? 32_000
-              : 24_000,
+      max_output_tokens: scale.maxOutputTokens,
     }),
     signal: request?.signal,
   });
@@ -119,10 +63,7 @@ export async function streamDeepResearch(
     const data = await upstream.json().catch(() => null);
     const message = errorMessage(data, `Deep Research failed (${upstream.status}).`);
     return Response.json(
-      {
-        error: message,
-        retryable: upstream.status === 429 || upstream.status >= 500,
-      },
+      { error: message, retryable: upstream.status === 429 || upstream.status >= 500 },
       {
         status: upstream.status,
         headers: upstream.headers.get("Retry-After")

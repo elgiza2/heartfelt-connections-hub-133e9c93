@@ -82,36 +82,39 @@ export default function ImageToolsBar({ onAttach, onUseCharacter }: Props) {
     }
   };
 
-  const btn =
-    "inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-[12.5px] font-medium text-foreground/85 hover:text-foreground bg-foreground/[0.07] hover:bg-foreground/[0.12] border border-foreground/10 transition disabled:opacity-50";
+  const iconBtn =
+    "inline-flex items-center justify-center w-8 h-8 rounded-full text-foreground/70 hover:text-foreground bg-foreground/[0.06] hover:bg-foreground/[0.11] transition disabled:opacity-50 shrink-0";
 
   return (
-    <div className="px-2 pt-2 pb-1 space-y-2" dir="auto">
-      <div className="flex flex-wrap items-center gap-2">
-        <button type="button" className={btn} onClick={() => uploadRef.current?.click()} disabled={busy}>
-          <ImagePlus className="w-3.5 h-3.5" />
-          Upload image
+    <div className="px-2 pt-1.5 pb-1 space-y-1.5" dir="auto">
+      <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
+        <button type="button" className={iconBtn} onClick={() => uploadRef.current?.click()} disabled={busy} title="Upload image" aria-label="Upload image">
+          <ImagePlus className="w-4 h-4" />
         </button>
-        <button type="button" className={btn} onClick={() => cutoutRef.current?.click()} disabled={busy}>
-          {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Eraser className="w-3.5 h-3.5" />}
-          Remove background
+        <button type="button" className={iconBtn} onClick={() => cutoutRef.current?.click()} disabled={busy} title="Remove background" aria-label="Remove background">
+          {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eraser className="w-4 h-4" />}
         </button>
-        <button type="button" className={btn} onClick={() => upscaleRef.current?.click()} disabled={busy}>
-          {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-          Upscale
+        <button type="button" className={iconBtn} onClick={() => upscaleRef.current?.click()} disabled={busy} title={`Upscale ×${upscaleFactor}`} aria-label="Upscale">
+          {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
         </button>
         <button
           type="button"
-          className={btn}
+          className="inline-flex items-center justify-center h-8 px-2.5 rounded-full text-[12px] font-semibold text-foreground/70 hover:text-foreground bg-foreground/[0.06] hover:bg-foreground/[0.11] transition disabled:opacity-50 shrink-0"
           onClick={() => setUpscaleFactor((v) => (v === 2 ? 4 : 2))}
           disabled={busy}
           aria-label="Change upscale factor"
         >
           ×{upscaleFactor}
         </button>
-        <button type="button" className={btn} onClick={() => setCharsOpen((v) => !v)}>
-          <Users className="w-3.5 h-3.5" />
-          My characters
+        <div className="w-px h-5 bg-foreground/10 mx-0.5 shrink-0" />
+        <button
+          type="button"
+          className={`${iconBtn} ${charsOpen ? "text-foreground bg-foreground/[0.12]" : ""}`}
+          onClick={() => setCharsOpen((v) => !v)}
+          title="My characters"
+          aria-label="My characters"
+        >
+          <Users className="w-4 h-4" />
         </button>
       </div>
 
