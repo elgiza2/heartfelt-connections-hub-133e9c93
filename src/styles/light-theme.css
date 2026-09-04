@@ -165,15 +165,26 @@ html.light .rounded-\[28px\] {
 }
 
 /* White cards on the grey canvas, with a clearly visible edge */
-html.light .bg-card:not(.theme-fixed),
-html.light .bg-background:not(.theme-fixed),
-html.light .bg-white:not(.theme-fixed),
+html.light .bg-card:not(.theme-fixed):not(.mobile-chat-header),
+html.light .bg-background:not(.theme-fixed):not(.mobile-chat-header),
+html.light .bg-white:not(.theme-fixed):not(.mobile-chat-header),
 html.light [data-card],
 html.light .settings-card,
 html.light .card {
   background-color: #ffffff !important;
   border-color: var(--hairline) !important;
 }
+
+/* Chat header blends into the chat canvas — never a white bar. */
+html.light .mobile-chat-header,
+html .mobile-chat-header {
+  background: hsl(var(--background)) !important;
+  background-color: hsl(var(--background)) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
 
 /* Composer card — white surface with a clear hairline edge on every breakpoint
    so the input box is visible against the white page. */
