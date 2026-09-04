@@ -216,7 +216,15 @@ function SlideRender({
   const sideImageLeft = layout === "split-left";
 
   // Accent: variant overrides palette accent (so 16 accent variants × layouts feel distinct).
-  const accentColor = (vAccent && ACCENT_HEX[vAccent]) || palette.accent;
+  // Safety net: a deck must never render a blank/white canvas even if the
+  // generator returned a partial palette — fall back to a sane dark theme.
+  const safePalette = {
+    bg: palette?.bg || "#0b0b0f",
+    fg: palette?.fg || "#f8fafc",
+    accent: palette?.accent || "#6366f1",
+    primary: palette?.primary || "#111827",
+  };
+  const accentColor = (vAccent && ACCENT_HEX[vAccent]) || safePalette.accent;
   // Alignment: text-align honored when explicit.
   const alignClass =
     vAlign === "center"
@@ -236,8 +244,8 @@ function SlideRender({
       className={`slide-content flex ${ornamentClass}`}
       data-density={vDensity || "balanced"}
       style={{
-        background: palette.bg,
-        color: palette.fg,
+        background: safePalette.bg,
+        color: safePalette.fg,
         direction: dir,
         ["--slide-accent-color" as never]: accentColor,
       }}
@@ -253,7 +261,7 @@ function SlideRender({
           <div
             className="absolute inset-0"
             style={{
-              background: `linear-gradient(135deg, ${palette.bg}ee, ${palette.bg}aa 60%, transparent)`,
+              background: `linear-gradient(135deg, ${safePalette.bg}ee, ${safePalette.bg}aa 60%, transparent)`,
             }}
           />
         </>
@@ -276,7 +284,7 @@ function SlideRender({
             <div
               className="absolute inset-0"
               style={{
-                background: `linear-gradient(${sideImageLeft ? (dir === "rtl" ? "90deg" : "270deg") : dir === "rtl" ? "270deg" : "90deg"}, ${palette.bg}, transparent 60%)`,
+                background: `linear-gradient(${sideImageLeft ? (dir === "rtl" ? "90deg" : "270deg") : dir === "rtl" ? "270deg" : "90deg"}, ${safePalette.bg}, transparent 60%)`,
               }}
             />
           </div>
@@ -333,7 +341,7 @@ function SlideRender({
                   <div
                     key={i}
                     className="rounded-3xl p-10"
-                    style={{ background: `${palette.fg}0d` }}
+                    style={{ background: `${safePalette.fg}0d` }}
                   >
                     <div
                       className="font-extrabold"
@@ -358,7 +366,7 @@ function SlideRender({
                 { title: slide.left_title, bullets: slide.left_bullets },
                 { title: slide.right_title, bullets: slide.right_bullets },
               ].map((col, i) => (
-                <div key={i} className="rounded-3xl p-10" style={{ background: `${palette.fg}0d` }}>
+                <div key={i} className="rounded-3xl p-10" style={{ background: `${safePalette.fg}0d` }}>
                   {col.title && (
                     <div className="slide-subtitle font-bold mb-6" style={{ color: accentColor }}>
                       {col.title}
@@ -387,11 +395,11 @@ function SlideRender({
                 <li
                   key={i}
                   className="flex gap-6 rounded-3xl p-8"
-                  style={{ background: `${palette.fg}0d` }}
+                  style={{ background: `${safePalette.fg}0d` }}
                 >
                   <span
                     className="shrink-0 w-16 h-16 rounded-full flex items-center justify-center font-extrabold"
-                    style={{ background: accentColor, color: palette.bg, fontSize: 32 }}
+                    style={{ background: accentColor, color: safePalette.bg, fontSize: 32 }}
                   >
                     {i + 1}
                   </span>
@@ -448,7 +456,7 @@ function SlideRender({
                 <div
                   key={i}
                   className="aspect-square rounded-2xl overflow-hidden"
-                  style={{ background: `${palette.fg}0d` }}
+                  style={{ background: `${safePalette.fg}0d` }}
                 >
                   <img loading="lazy" decoding="async" src={u} alt="" className="w-full h-full object-cover" />
                 </div>
@@ -484,7 +492,7 @@ function SlideRender({
             {isClosing && slide.cta && (
               <div
                 className="mt-10 inline-flex px-10 py-5 rounded-full slide-body-lg font-semibold"
-                style={{ background: accentColor, color: palette.bg }}
+                style={{ background: accentColor, color: safePalette.bg }}
               >
                 {slide.cta}
               </div>
