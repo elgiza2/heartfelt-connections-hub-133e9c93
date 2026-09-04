@@ -149,11 +149,6 @@ export default function MobilePushShell({
 
         {/* Tap-to-close overlay + dim, mobile only */}
         <motion.div
-          className={`md:hidden absolute inset-0 z-[60] ${
-            open
-              ? "pointer-events-auto"
-              : "pointer-events-none"
-          }`}
           className={`md:hidden absolute inset-0 z-[60] bg-foreground/20 ${
             open
               ? "pointer-events-auto"

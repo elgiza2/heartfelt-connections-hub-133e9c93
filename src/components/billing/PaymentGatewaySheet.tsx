@@ -75,7 +75,6 @@ function PaymentGatewaySheetImpl({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center sm:justify-center"
       dir="ltr"
       className="fixed inset-0 z-[100] flex items-end justify-center bg-foreground/25 sm:items-center"
     >
