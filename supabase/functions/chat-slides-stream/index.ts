@@ -125,17 +125,50 @@ async function buildDeck(
     `Build the deck for this brief:\n\n${args.topic}`,
     4000,
   );
-  const parsed = extractJson(raw);
+  let parsed: any = {};
+  try {
+    parsed = extractJson(raw);
+  } catch (error) {
+    console.error("chat-slides-stream: failed to parse deck JSON", error);
+    parsed = {};
+  }
   const colors = args.templateColors && args.templateColors.length === 2
     ? args.templateColors
     : ["#111827", "#6366f1"];
+  // Always derive a readable bg/fg pair from the template accent so a deck
+  // never renders with an unreadable or blank canvas — dark templates get a
+  // dark, high-contrast theme instead of forcing white everywhere.
+  const primary = String(colors[0] || "#111827");
+  const looksDark = /^#(?:[0-3][0-9a-f]){3}$/i.test(primary) || /^#0[0-9a-f]{5}$/i.test(primary);
+  const palette = {
+    primary,
+    accent: String(colors[1] || "#6366f1"),
+    bg: looksDark ? primary : "#ffffff",
+    fg: looksDark ? "#f8fafc" : "#111111",
+  };
+
+  let slides = Array.isArray(parsed.slides) ? parsed.slides.filter((s: unknown) => s && typeof s === "object") : [];
+  if (!slides.length) {
+    // Guaranteed fallback content so the deck never renders blank/white
+    // when the model returns malformed or empty JSON.
+    slides = [
+      { type: "cover", title: String(parsed.title || args.topic.slice(0, 80)), subtitle: "" },
+      {
+        type: "bullets",
+        title: "Overview",
+        bullets: [args.topic.slice(0, 140) || "Overview"],
+      },
+      { type: "closing", title: "Thank you" },
+    ];
+  }
+
   return {
-    title: String(parsed.title || args.topic.slice(0, 80)),
+    title: String(parsed.title || args.topic.slice(0, 80)) || "Untitled deck",
     subtitle: parsed.subtitle ? String(parsed.subtitle) : undefined,
     language: args.language,
     templateId: args.templateId,
-    palette: { primary: colors[0], accent: colors[1], bg: "#ffffff", fg: "#111111" },
-    slides: Array.isArray(parsed.slides) ? parsed.slides : [],
+    palette,
+    slides,
   };
 }
 

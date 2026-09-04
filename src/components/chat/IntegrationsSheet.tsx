@@ -147,6 +147,13 @@ export default function IntegrationsSheet({ open, onOpenChange }: Props) {
               sheetKind="integrations"
               onClose={() => onOpenChange(false)}
             >
+              <Suspense
+                fallback={
+                  <div className="flex min-h-[200px] items-center justify-center">
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-border border-t-foreground/60" />
+                  </div>
+                }
+              >
               <div className="flex min-h-full flex-col">
                 <AnimatePresence mode="wait" initial={false}>
                   {apiDetail ? (
@@ -303,6 +310,7 @@ export default function IntegrationsSheet({ open, onOpenChange }: Props) {
                   )}
                 </AnimatePresence>
               </div>
+              </Suspense>
             </DraggablePlusSheet>
           </Suspense>
         </>
