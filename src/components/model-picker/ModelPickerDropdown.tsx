@@ -1,5 +1,4 @@
 import { m as motion } from "framer-motion";
-import { Check } from "lucide-react";
 import type { AgentModel } from "@/lib/agentRegistry";
 import { glassModelMenu, glassModelMenuStyle } from "./glassModelMenuStyles";
 

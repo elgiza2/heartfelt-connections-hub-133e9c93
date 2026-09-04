@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { PptxPreviewScreen } from "@/components/chat/StandardSlidesCard";
 import { readSlidesFileForPreview, type SlidesFilePreviewPayload } from "@/lib/slidesFilePreviewStore";
+import { Button } from "@/components/ui/button";
 
 const SlidesFilePreviewPage = () => {
   const { id = "" } = useParams();
@@ -25,14 +26,14 @@ const SlidesFilePreviewPage = () => {
     return (
       <main className="min-h-dvh flex flex-col items-center justify-center gap-4 bg-background text-foreground">
         <p className="text-sm opacity-80">Preview not available. Please regenerate the deck.</p>
-        <button
+        <Button
           onClick={() => navigate("/chat")}
           data-slides-preview-button
-          style={{ backgroundColor: "#ffffff", color: "#000000", WebkitTextFillColor: "#000000" }}
-          className="px-5 py-2.5 rounded-full font-semibold text-sm"
+          variant="neutral"
+          className="rounded-full px-5"
         >
           Back to chat
-        </button>
+        </Button>
       </main>
     );
   }

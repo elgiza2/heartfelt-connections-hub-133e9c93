@@ -1,5 +1,5 @@
 import { Blocks } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useConnectedApps } from "@/hooks/useConnectedApps";
 import { Button } from "@/components/ui/button";
 
@@ -19,6 +19,31 @@ const prefetchIntegrationsSheet = () => {
   void import("@/components/chat/IntegrationsSheet");
   void import("@/pages/chat/components/DraggablePlusSheet");
 };
+
+function ConnectedAppLogo({ name, domain }: { name: string; domain?: string }) {
+  const sources = domain
+    ? [
+        `https://www.google.com/s2/favicons?domain=${domain}&sz=64`,
+        `https://unavatar.io/${domain}?fallback=false`,
+      ]
+    : [];
+  const [sourceIndex, setSourceIndex] = useState(0);
+  const source = sources[sourceIndex];
+
+  return source ? (
+    <img
+      src={source}
+      alt={name}
+      width={24}
+      height={24}
+      loading="lazy"
+      className="h-full w-full object-contain p-1"
+      onError={() => setSourceIndex((current) => current + 1)}
+    />
+  ) : (
+    <span className="text-[10px] font-semibold text-foreground/80">{name.slice(0, 1)}</span>
+  );
+}
 
 export function ComposerIntegrationsButton({ onClick, label = "Integrations" }: Props) {
   const apps = useConnectedApps();
@@ -58,20 +83,7 @@ export function ComposerIntegrationsButton({ onClick, label = "Integrations" }: 
               className="inline-flex items-center justify-center w-6 h-6 rounded-full overflow-hidden bg-foreground/10 ring-1 ring-background"
               style={{ marginInlineStart: i === 0 ? 0 : -8, zIndex: 10 - i }}
             >
-              {a.domain ? (
-                <img
-                  src={`https://logo.clearbit.com/${a.domain}`}
-                  alt={a.name}
-                  width={24}
-                  height={24}
-                  loading="lazy"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="text-[10px] font-semibold text-foreground/80">
-                  {a.name.slice(0, 1)}
-                </span>
-              )}
+              <ConnectedAppLogo name={a.name} domain={a.domain} />
             </span>
           ))}
           {extra > 0 && (
