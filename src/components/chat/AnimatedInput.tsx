@@ -53,6 +53,8 @@ interface AnimatedInputProps {
   headerSlot?: React.ReactNode;
   inlineSlot?: React.ReactNode;
   activeServiceSlot?: React.ReactNode;
+  /** Small icon buttons (model / template pickers) rendered in the bottom control row. */
+  serviceTools?: React.ReactNode;
   isEditing?: boolean;
   onCancelEdit?: () => void;
   /** When true, the composer sits in a chat context and uses a liquid-glass surface. */
@@ -83,6 +85,7 @@ const AnimatedInput = ({
   headerSlot,
   inlineSlot,
   activeServiceSlot,
+  serviceTools,
   isEditing,
   onCancelEdit,
   onPlusClick,
@@ -328,7 +331,7 @@ const AnimatedInput = ({
                     <button
                       type="button"
                       onClick={onCancelEdit}
-                      className="inline-flex items-center justify-center w-6 h-6 rounded-full text-foreground/60 hover:text-foreground hover:bg-foreground/10 active:scale-90 transition"
+                      className="inline-flex items-center justify-center w-6 h-6 rounded-full text-foreground/60 hover:text-foreground hover:bg-foreground/10 transition"
                       aria-label={uiT("cancelEdit")}
                     >
                       <X className="w-3.5 h-3.5" strokeWidth={2.4} />
@@ -452,6 +455,8 @@ const AnimatedInput = ({
                 onChange(value ? `${value.trimEnd()} ${text}` : text)
               }
             />
+
+            {serviceTools}
 
             <div className="flex-1" />
 

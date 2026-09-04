@@ -13,6 +13,11 @@ interface Props {
  * - Many apps → a clean overlapped stack of up to 3 logos (+N).
  * Fully transparent: no background, no border.
  */
+const prefetchIntegrationsSheet = () => {
+  void import("@/components/chat/IntegrationsSheet");
+  void import("@/pages/chat/components/DraggablePlusSheet");
+};
+
 export function ComposerIntegrationsButton({ onClick, label = "Integrations" }: Props) {
   const apps = useConnectedApps();
   const shown = apps.slice(0, 3);
@@ -22,8 +27,9 @@ export function ComposerIntegrationsButton({ onClick, label = "Integrations" }: 
     <button
       type="button"
       onClick={onClick}
+      onPointerDown={prefetchIntegrationsSheet}
       aria-label={label}
-      className="shrink-0 inline-flex h-11 w-11 md:h-10 md:w-10 items-center justify-center rounded-full border-0 bg-transparent outline-none transition-opacity hover:opacity-80 active:scale-95"
+      className="shrink-0 inline-flex h-11 w-11 md:h-10 md:w-10 items-center justify-center rounded-full border-0 bg-transparent outline-none transition-opacity hover:opacity-80"
       style={{ background: "transparent", border: 0, boxShadow: "none" }}
     >
       {shown.length === 0 ? (

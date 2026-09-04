@@ -10,14 +10,7 @@ import {
   disconnectIntegration,
   waitForConnectionRefresh,
 } from "@/lib/integrationBackend";
-import IntegrationRow from "./integrations/IntegrationRow";
-import IntegrationDetail from "./integrations/IntegrationDetail";
 import EmptyConnectors from "./integrations/EmptyConnectors";
-import McpTab from "./integrations/McpTab";
-import AgentTools from "./integrations/AgentTools";
-import AppActionsPanel from "./integrations/AppActionsPanel";
-import ApiAppsTab from "./integrations/ApiAppsTab";
-import ApiAppDetail from "./integrations/ApiAppDetail";
 import type { ApiApp } from "@/lib/apiApps/types";
 
 const DraggablePlusSheet = lazy(() =>
@@ -25,6 +18,16 @@ const DraggablePlusSheet = lazy(() =>
     default: m.DraggablePlusSheet,
   })),
 );
+
+// Heavy tab/detail content is lazy so the sheet shell (grip, search, tabs)
+// paints immediately instead of waiting on these chunks.
+const IntegrationRow = lazy(() => import("./integrations/IntegrationRow"));
+const IntegrationDetail = lazy(() => import("./integrations/IntegrationDetail"));
+const McpTab = lazy(() => import("./integrations/McpTab"));
+const AgentTools = lazy(() => import("./integrations/AgentTools"));
+const AppActionsPanel = lazy(() => import("./integrations/AppActionsPanel"));
+const ApiAppsTab = lazy(() => import("./integrations/ApiAppsTab"));
+const ApiAppDetail = lazy(() => import("./integrations/ApiAppDetail"));
 
 interface Props {
   open: boolean;
@@ -144,6 +147,13 @@ export default function IntegrationsSheet({ open, onOpenChange }: Props) {
               sheetKind="integrations"
               onClose={() => onOpenChange(false)}
             >
+              <Suspense
+                fallback={
+                  <div className="flex min-h-[200px] items-center justify-center">
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-border border-t-foreground/60" />
+                  </div>
+                }
+              >
               <div className="flex min-h-full flex-col">
                 <AnimatePresence mode="wait" initial={false}>
                   {apiDetail ? (
@@ -300,6 +310,7 @@ export default function IntegrationsSheet({ open, onOpenChange }: Props) {
                   )}
                 </AnimatePresence>
               </div>
+              </Suspense>
             </DraggablePlusSheet>
           </Suspense>
         </>

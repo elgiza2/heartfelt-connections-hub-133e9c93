@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Download, ArrowLeft, Loader2, Share2 } from "lucide-react";
+import { Download, ArrowLeft, Loader2, Share2, RectangleVertical, RectangleHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import slidesCardCover from "@/assets/slides-card-cover.png";
 import { stashSlidesFileForPreview } from "@/lib/slidesFilePreviewStore";
@@ -142,14 +142,14 @@ const StandardSlidesCard = ({ title, url, colors, chatName }: Props) => {
           onClick={openPreview}
           data-slides-preview-button
           style={{ backgroundColor: "#ffffff", color: "#000000", WebkitTextFillColor: "#000000" }}
-          className="slides-card-button slides-card-button--accent flex-1 flex items-center justify-center py-3 text-sm font-medium active:scale-[0.98]"
+          className="slides-card-button slides-card-button--accent flex-1 flex items-center justify-center py-3 text-sm font-medium"
         >
           Preview
         </button>
         <a
           href={url}
           download
-          className="slides-card-button slides-card-button--secondary flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium active:scale-[0.98]"
+          className="slides-card-button slides-card-button--secondary flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium"
         >
           <Download className="w-4 h-4" />
           Download
@@ -169,6 +169,7 @@ export const PptxPreviewScreen = ({ url, chatName, onBack }: PreviewProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [portrait, setPortrait] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -180,8 +181,10 @@ export const PptxPreviewScreen = ({ url, chatName, onBack }: PreviewProps) => {
         // Clear any previous render
         containerRef.current.innerHTML = "";
 
-        const width = Math.min(window.innerWidth - 24, 1600);
-        const height = (width * 9) / 16;
+        const width = portrait
+          ? Math.min(window.innerHeight - 200, 900)
+          : Math.min(window.innerWidth - 24, 1600);
+        const height = portrait ? (width * 16) / 9 : (width * 9) / 16;
 
         const previewer = init(containerRef.current, { width, height });
         const res = await fetch(url);
@@ -216,20 +219,18 @@ export const PptxPreviewScreen = ({ url, chatName, onBack }: PreviewProps) => {
     return () => {
       cancelled = true;
     };
-  }, [url]);
+  }, [url, portrait]);
 
   return (
     <div className="min-h-dvh bg-background flex flex-col">
-      <header className="flex items-center gap-3 px-4 py-3 shrink-0">
-        <button
-          onClick={onBack}
-          className="h-9 w-9 rounded-full text-foreground/80 hover:text-foreground flex items-center justify-center shrink-0 transition"
-          aria-label="Back"
-        >
-          <ArrowLeft className="w-4 h-4" />
-        </button>
-        <span className="text-sm font-semibold text-foreground truncate">{chatName || "—"}</span>
-      </header>
+      <button
+        onClick={onBack}
+        aria-label="Back"
+        className="fixed top-[calc(env(safe-area-inset-top)+12px)] left-4 z-20 h-10 w-10 rounded-full bg-foreground/10 backdrop-blur hover:bg-foreground/20 text-foreground flex items-center justify-center"
+      >
+        <ArrowLeft className="w-4.5 h-4.5" />
+      </button>
+      <div className="h-[calc(env(safe-area-inset-top)+56px)] shrink-0" aria-hidden />
 
       <div className="flex-1 overflow-y-auto overflow-x-hidden py-3 px-2 sm:py-4 sm:px-3">
         {loading && (
@@ -244,7 +245,7 @@ export const PptxPreviewScreen = ({ url, chatName, onBack }: PreviewProps) => {
             <a
               href={url}
               download
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-foreground text-background font-semibold text-[13px] hover:bg-foreground/90 transition active:scale-[0.98]"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-foreground text-background font-semibold text-[13px] hover:bg-foreground/90 transition"
             >
               <Download className="w-4 h-4" /> Download file instead
             </a>
@@ -272,20 +273,26 @@ export const PptxPreviewScreen = ({ url, chatName, onBack }: PreviewProps) => {
         <a
           href={url}
           download
-          className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-full text-sm font-semibold tracking-wide transition active:scale-[0.98] bg-foreground text-background hover:bg-foreground/90"
+          className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-full text-sm font-semibold tracking-wide transition bg-foreground text-background hover:bg-foreground/90"
         >
           <Download className="w-4 h-4" />
           Download
         </a>
         <button
           type="button"
-          onClick={() =>
-            sharePptx(url, `${chatName.replace(/\s+/g, "-").slice(0, 40) || "presentation"}.pptx`)
-          }
-          className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-full text-sm font-semibold tracking-wide transition active:scale-[0.98] bg-foreground/10 hover:bg-foreground/18 text-foreground border border-foreground/10"
+          onClick={() => {
+            setLoading(true);
+            setPortrait((p) => !p);
+          }}
+          aria-label={portrait ? "Switch to landscape" : "Switch to portrait"}
+          className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-full text-sm font-semibold tracking-wide transition bg-foreground/10 hover:bg-foreground/18 text-foreground border border-foreground/10"
         >
-          <Share2 className="w-4 h-4" />
-          Share
+          {portrait ? (
+            <RectangleHorizontal className="w-4 h-4" />
+          ) : (
+            <RectangleVertical className="w-4 h-4" />
+          )}
+          {portrait ? "Landscape" : "Portrait"}
         </button>
       </footer>
     </div>

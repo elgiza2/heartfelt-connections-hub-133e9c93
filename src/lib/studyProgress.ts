@@ -257,20 +257,11 @@ export function subscribeStudyState(cb: () => void): () => void {
   };
 }
 
-/** Small helper: unified haptic pulse for LearnCard interactions. */
-export function hapticFeedback(kind: "correct" | "wrong" | "tap" | "streak"): void {
-  if (typeof navigator === "undefined") return;
-  const nav = navigator as any;
-  if (typeof nav.vibrate !== "function") return;
-  try {
-    if (kind === "correct") nav.vibrate(8);
-    else if (kind === "wrong") nav.vibrate([8, 40, 8]);
-    else if (kind === "streak") nav.vibrate([12, 30, 12, 30, 20]);
-    else nav.vibrate(4);
-  } catch {
-    /* iOS Safari & some browsers throw when called outside a gesture */
-  }
+/** Vibration disabled product-wide — kept as a no-op for call sites. */
+export function hapticFeedback(_kind: "correct" | "wrong" | "tap" | "streak"): void {
+  /* noop */
 }
+
 
 /** Respect the OS "reduce motion" preference — used across LearnCard. */
 export function prefersReducedMotion(): boolean {

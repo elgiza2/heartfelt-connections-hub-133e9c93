@@ -61,7 +61,7 @@ export default function UpgradeRequiredCard({ feature }: { feature: Feature }) {
         <button
           type="button"
           onClick={() => navigate("/pricing")}
-          className="btn-sunset group inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-2xl px-4 text-[14px] font-semibold transition active:scale-[0.98]"
+          className="btn-sunset group inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-2xl px-4 text-[14px] font-semibold transition"
         >
           <Sparkles className="h-4 w-4" strokeWidth={2.4} />
           <span>{tx("Upgrade now")}</span>

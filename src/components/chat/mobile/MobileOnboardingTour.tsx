@@ -387,7 +387,7 @@ export const MobileOnboardingTour = () => {
             <button
               type="button"
               onClick={next}
-              className="rounded-full bg-white px-4 py-2 text-[13px] font-semibold text-background transition-transform active:scale-95"
+              className="rounded-full bg-white px-4 py-2 text-[13px] font-semibold text-background transition-transform"
             >
               {step >= STEPS.length - 1 ? "Got it" : "Next"}
             </button>

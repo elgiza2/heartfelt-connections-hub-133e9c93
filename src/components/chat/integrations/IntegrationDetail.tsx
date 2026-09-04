@@ -175,7 +175,7 @@ export default function IntegrationDetail({ item, connected, busy, onBack, onTog
           type="button"
           onClick={onToggle}
           disabled={busy}
-          className={`inline-flex h-[52px] w-full items-center justify-center gap-2 rounded-[18px] text-[15px] font-semibold transition-all active:scale-[0.985] disabled:opacity-60 ${
+          className={`inline-flex h-[52px] w-full items-center justify-center gap-2 rounded-[18px] text-[15px] font-semibold transition-all disabled:opacity-60 ${
             connected
               ? "bg-foreground/[0.07] text-foreground"
               : "bg-primary text-primary-foreground"

@@ -126,7 +126,7 @@ export function MobileServicePanelRenderer(p: MobileServicePanelRendererProps) {
                 return (
                   <label
                     key={slot}
-                    className={`relative flex flex-col items-center justify-center aspect-square rounded-xl border border-dashed text-[10.5px] font-semibold cursor-pointer overflow-hidden transition-all active:scale-[0.98] ${
+                    className={`relative flex flex-col items-center justify-center aspect-square rounded-xl border border-dashed text-[10.5px] font-semibold cursor-pointer overflow-hidden transition-all ${
                       url
                         ? "border-foreground/30 bg-foreground/[0.04]"
                         : "border-foreground/20 bg-foreground/[0.03] hover:bg-foreground/[0.06] text-foreground/65"

@@ -164,18 +164,9 @@ export default function MobileChatHeader({
   const [menuView, setMenuView] = useState<MenuView>("main");
   const navigate = useNavigate();
 
-  // Once the message list is scrolled the header sits on top of content, so it
-  // takes the page background colour instead of staying transparent.
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const el = scrollContainerRef?.current;
-    const read = () =>
-      setScrolled((el ? el.scrollTop : window.scrollY) > 4);
-    read();
-    const target: HTMLElement | Window = el ?? window;
-    target.addEventListener("scroll", read, { passive: true });
-    return () => target.removeEventListener("scroll", read);
-  }, [scrollContainerRef]);
+  // The header always uses the page background so it blends seamlessly with
+  // the chat surface — no colour change on scroll.
+
 
   const lang = useUserLang();
 
@@ -229,9 +220,8 @@ export default function MobileChatHeader({
       <div
         data-testid="mobile-chat-header"
         style={{ top: "var(--promo-banner-h, 0px)" }}
-        className={`mobile-chat-header md:hidden fixed inset-x-0 z-30 flex items-center gap-2 px-3 py-1.5 min-h-[44px] pt-[max(env(safe-area-inset-top),0.25rem)] pointer-events-none [&>*]:pointer-events-auto border-0 transition-colors duration-200 ${
-          scrolled ? "bg-background pointer-events-auto" : "bg-transparent"
-        }`}
+        className="mobile-chat-header md:hidden fixed inset-x-0 z-30 flex items-center gap-2 px-3 py-1.5 min-h-[44px] pt-[max(env(safe-area-inset-top),0.25rem)] pointer-events-none [&>*]:pointer-events-auto border-0 bg-background pointer-events-auto"
+
 
       >
         <button
@@ -239,7 +229,7 @@ export default function MobileChatHeader({
             onClick={onOpenSidebar}
             aria-label="Open menu"
             data-testid="mobile-open-sidebar"
-            className="w-11 h-11 rounded-full flex items-center justify-center text-foreground active:scale-95 transition bg-transparent border-0"
+            className="w-11 h-11 rounded-full flex items-center justify-center text-foreground transition bg-transparent border-0"
           >
             <MegsySidebarToggleIcon />
         </button>
@@ -265,7 +255,7 @@ export default function MobileChatHeader({
           <button
             type="button"
             onClick={() => navigate("/auth")}
-            className="btn-sunset h-9 px-4 rounded-2xl text-[13px] font-bold active:scale-95 transition mb-0.5"
+            className="btn-sunset h-9 px-4 rounded-2xl text-[13px] font-bold transition mb-0.5"
           >
             {uiT("Sign in", lang)}
           </button>

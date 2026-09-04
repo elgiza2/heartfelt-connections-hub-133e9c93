@@ -32,6 +32,7 @@ import { visit, SKIP } from "unist-util-visit";
 import { toString } from "mdast-util-to-string";
 import { toast } from "sonner";
 import ThinkingLoader from "./ThinkingLoader";
+import SlidesGenerationProgress from "./SlidesGenerationProgress";
 import { type ParallelAgentTask } from "./ParallelAgentsPanel";
 import { detectLang, langDir } from "@/lib/detectLang";
 import { parseLearnSegments, hasLearnCards } from "@/lib/learnCardParser";
@@ -86,7 +87,7 @@ import { Message, MessageContent } from "@/components/prompt-kit/message";
 import ThinkingTrace from "./ThinkingTrace";
 import { estimateTokens, formatTokens } from "@/pages/chat/utils/estimateTokens";
 import { SecureVideo } from "@/components/chat/media/SecureVideo";
-import { stripPlanClaims } from "@/pages/chat/chatUtils";
+import { stripPlanClaims, sanitizeLeakedToolText } from "@/pages/chat/chatUtils";
 
 
 interface ChatMessageProps {
@@ -1041,7 +1042,7 @@ const ChatMessage = ({
     // Final render-time guard: no assistant text may claim a plan / paid status,
     // regardless of which pipeline (chat, long-run, replay) produced it.
     return {
-      displayContent: stripPlanClaims(normalized.cleaned),
+      displayContent: sanitizeLeakedToolText(stripPlanClaims(normalized.cleaned)),
       inlineImages: normalized.extractedImages,
     };
   }, [content, role]);
@@ -1500,15 +1501,19 @@ const ChatMessage = ({
           />
         )}
         {showLiveThinkingTrace && (
-          <ThinkingTrace
-            status={searchStatus}
-            steps={[...(narrations || []), ...(activeThinkingSteps || [])]}
-            text={reasoning}
-            active
-            tool={activeToolName}
-            running={hasRunningTool || toolActivity?.status === "running"}
-            className={content ? "mb-2" : ""}
-          />
+          isSlidesMode ? (
+            <SlidesGenerationProgress status={searchStatus} className={content ? "mb-2" : ""} />
+          ) : (
+            <ThinkingTrace
+              status={searchStatus}
+              steps={[...(narrations || []), ...(activeThinkingSteps || [])]}
+              text={reasoning}
+              active
+              tool={activeToolName}
+              running={hasRunningTool || toolActivity?.status === "running"}
+              className={content ? "mb-2" : ""}
+            />
+          )
         )}
         {role === "assistant" &&
           reasoning &&

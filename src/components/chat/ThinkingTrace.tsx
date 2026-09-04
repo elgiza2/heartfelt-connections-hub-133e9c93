@@ -83,22 +83,47 @@ const ThinkingTrace = ({
 
   // No elapsed-seconds counter in the UI — the trace shows real activity only.
 
+  // Raw stream lines can carry tool markers or JSON fragments — never show
+  // those. Also collapse whitespace so the trace reads as clean sentences.
+  const clean = (raw: string): string => {
+    let v = String(raw || "")
+      .replace(/<\/?[a-z_]+(?:\s[^>]*)?>/gi, " ")
+      .replace(/```[\s\S]*?```/g, " ")
+      .replace(/[*_`#]+/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (/^[[{]/.test(v) || /"(tool_call|function_call|arguments|parameters)"/.test(v)) return "";
+    if (v.length > 220) v = `${v.slice(0, 220)}…`;
+    return v;
+  };
+
   const reasoningLines = useMemo(() => {
     if (!text?.trim()) return [] as string[];
     const out: string[] = [];
     for (const p of text.trim().split(/\n{2,}|\n/)) {
-      const v = p.trim();
+      const v = clean(p);
       if (v && out[out.length - 1] !== v) out.push(v);
     }
     return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text]);
 
-  const lines = useMemo(
-    () => [...historyRef.current, ...reasoningLines],
-    // historyRef mutations are surfaced through forceRender
+  // Activity steps stay in the order they happened, deduped.
+  const stepLines = useMemo(() => {
+    const out: string[] = [];
+    for (const raw of historyRef.current) {
+      const v = clean(raw);
+      if (v && !out.includes(v)) out.push(v);
+    }
+    return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [reasoningLines, historyRef.current.length],
+  }, [historyRef.current.length]);
+
+  const lines = useMemo(
+    () => [...stepLines, ...reasoningLines],
+    [stepLines, reasoningLines],
   );
+
 
   const hasBody = lines.length > 0;
   const label = active ? uiT("thinking", lang) : uiT("thoughts", lang);
@@ -161,22 +186,40 @@ const ThinkingTrace = ({
       </button>
 
       {open && (
-        <div className="mt-2 max-h-80 overflow-y-auto">
-          <div className="flex flex-col gap-2.5 border-s border-border/40 ps-3">
-            {hasBody ? (
-              lines.map((line, i) => (
-                <div
-                  key={`${i}-${line.slice(0, 24)}`}
-                  className="flex items-start gap-2 text-[12.5px] leading-relaxed text-muted-foreground"
-                >
-                  <span
-                    aria-hidden
-                    className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-border"
-                  />
-                  <span className="min-w-0 whitespace-pre-wrap break-words">{line}</span>
-                </div>
-              ))
-            ) : (
+        <div className="mt-2 max-h-80 overflow-y-auto rounded-xl bg-muted/30 p-3">
+          <div className="flex flex-col gap-3">
+            {stepLines.length > 0 && (
+              <ol className="flex flex-col gap-2">
+                {stepLines.map((line, i) => (
+                  <li
+                    key={`s-${i}-${line.slice(0, 24)}`}
+                    className="flex items-start gap-2.5 text-[12.5px] leading-relaxed text-muted-foreground"
+                  >
+                    <span
+                      aria-hidden
+                      className="mt-[3px] grid h-4 w-4 shrink-0 place-items-center rounded-full bg-border/60 text-[9px] font-semibold text-foreground/70"
+                    >
+                      {i + 1}
+                    </span>
+                    <span className="min-w-0 break-words">{line}</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+            {reasoningLines.length > 0 && (
+              <div className="flex flex-col gap-1.5 border-t border-border/40 pt-2.5">
+                {reasoningLines.map((line, i) => (
+                  <p
+                    key={`r-${i}-${line.slice(0, 24)}`}
+                    className="text-[12.5px] leading-relaxed text-muted-foreground/90 break-words"
+                  >
+                    {line}
+                  </p>
+                ))}
+              </div>
+            )}
+            {!hasBody && (
+
               <div className="text-[12.5px] text-muted-foreground">
                 {isAr ? "لا توجد تفاصيل بعد…" : "No details yet…"}
               </div>

@@ -4,7 +4,7 @@ import { useNavigate, useInRouterContext } from "react-router-dom";
 import {
   ChevronLeft,
   ChevronRight,
-  X,
+  ArrowLeft,
   Maximize2,
   Download,
   Loader2,
@@ -12,6 +12,10 @@ import {
   FileType2,
   MoveHorizontal,
   MoveVertical,
+  RectangleVertical,
+  RectangleHorizontal,
+  X,
+
 } from "lucide-react";
 import { toast } from "sonner";
 import { exportDeckHtml, exportDeckPptx } from "@/lib/slidesExport";
@@ -138,26 +142,35 @@ export function parseVariant(layoutOrVariant: string | undefined) {
 /* ============================================================
  * ScaledSlide — fixed 1920x1080 canvas, scales to fit parent.
  * ============================================================ */
-function ScaledSlide({ children }: { children: React.ReactNode }) {
+function ScaledSlide({ children, portrait = false }: { children: React.ReactNode; portrait?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
+  const canvasW = portrait ? 1080 : 1920;
+  const canvasH = portrait ? 1920 : 1080;
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
     const compute = () => {
       const r = el.getBoundingClientRect();
       if (r.width === 0 || r.height === 0) return;
-      const s = Math.min(r.width / 1920, r.height / 1080);
+      const s = Math.min(r.width / canvasW, r.height / canvasH);
       setScale(s);
     };
     compute();
     const ro = new ResizeObserver(compute);
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [canvasW, canvasH]);
   return (
     <div ref={ref} className="slide-stage">
-      <div className="slide-canvas" style={{ ["--slide-scale" as never]: scale }}>
+      <div
+        className="slide-canvas"
+        style={{
+          ["--slide-scale" as never]: scale,
+          width: canvasW,
+          height: canvasH,
+        }}
+      >
         {children}
       </div>
     </div>
@@ -172,10 +185,12 @@ function SlideRender({
   slide,
   palette,
   dir,
+  portrait = false,
 }: {
   slide: SlideData;
   palette: SlideDeck["palette"];
   dir: "ltr" | "rtl";
+  portrait?: boolean;
 }) {
   const rawLayout = (slide.layout || slide.variant || "").toLowerCase();
   const {
@@ -216,7 +231,15 @@ function SlideRender({
   const sideImageLeft = layout === "split-left";
 
   // Accent: variant overrides palette accent (so 16 accent variants × layouts feel distinct).
-  const accentColor = (vAccent && ACCENT_HEX[vAccent]) || palette.accent;
+  // Safety net: a deck must never render a blank/white canvas even if the
+  // generator returned a partial palette — fall back to a sane dark theme.
+  const safePalette = {
+    bg: palette?.bg || "#0b0b0f",
+    fg: palette?.fg || "#f8fafc",
+    accent: palette?.accent || "#6366f1",
+    primary: palette?.primary || "#111827",
+  };
+  const accentColor = (vAccent && ACCENT_HEX[vAccent]) || safePalette.accent;
   // Alignment: text-align honored when explicit.
   const alignClass =
     vAlign === "center"
@@ -236,9 +259,11 @@ function SlideRender({
       className={`slide-content flex ${ornamentClass}`}
       data-density={vDensity || "balanced"}
       style={{
-        background: palette.bg,
-        color: palette.fg,
+        background: safePalette.bg,
+        color: safePalette.fg,
         direction: dir,
+        width: portrait ? 1080 : 1920,
+        height: portrait ? 1920 : 1080,
         ["--slide-accent-color" as never]: accentColor,
       }}
     >
@@ -253,7 +278,7 @@ function SlideRender({
           <div
             className="absolute inset-0"
             style={{
-              background: `linear-gradient(135deg, ${palette.bg}ee, ${palette.bg}aa 60%, transparent)`,
+              background: `linear-gradient(135deg, ${safePalette.bg}ee, ${safePalette.bg}aa 60%, transparent)`,
             }}
           />
         </>
@@ -276,7 +301,7 @@ function SlideRender({
             <div
               className="absolute inset-0"
               style={{
-                background: `linear-gradient(${sideImageLeft ? (dir === "rtl" ? "90deg" : "270deg") : dir === "rtl" ? "270deg" : "90deg"}, ${palette.bg}, transparent 60%)`,
+                background: `linear-gradient(${sideImageLeft ? (dir === "rtl" ? "90deg" : "270deg") : dir === "rtl" ? "270deg" : "90deg"}, ${safePalette.bg}, transparent 60%)`,
               }}
             />
           </div>
@@ -333,7 +358,7 @@ function SlideRender({
                   <div
                     key={i}
                     className="rounded-3xl p-10"
-                    style={{ background: `${palette.fg}0d` }}
+                    style={{ background: `${safePalette.fg}0d` }}
                   >
                     <div
                       className="font-extrabold"
@@ -358,7 +383,7 @@ function SlideRender({
                 { title: slide.left_title, bullets: slide.left_bullets },
                 { title: slide.right_title, bullets: slide.right_bullets },
               ].map((col, i) => (
-                <div key={i} className="rounded-3xl p-10" style={{ background: `${palette.fg}0d` }}>
+                <div key={i} className="rounded-3xl p-10" style={{ background: `${safePalette.fg}0d` }}>
                   {col.title && (
                     <div className="slide-subtitle font-bold mb-6" style={{ color: accentColor }}>
                       {col.title}
@@ -387,11 +412,11 @@ function SlideRender({
                 <li
                   key={i}
                   className="flex gap-6 rounded-3xl p-8"
-                  style={{ background: `${palette.fg}0d` }}
+                  style={{ background: `${safePalette.fg}0d` }}
                 >
                   <span
                     className="shrink-0 w-16 h-16 rounded-full flex items-center justify-center font-extrabold"
-                    style={{ background: accentColor, color: palette.bg, fontSize: 32 }}
+                    style={{ background: accentColor, color: safePalette.bg, fontSize: 32 }}
                   >
                     {i + 1}
                   </span>
@@ -448,7 +473,7 @@ function SlideRender({
                 <div
                   key={i}
                   className="aspect-square rounded-2xl overflow-hidden"
-                  style={{ background: `${palette.fg}0d` }}
+                  style={{ background: `${safePalette.fg}0d` }}
                 >
                   <img loading="lazy" decoding="async" src={u} alt="" className="w-full h-full object-cover" />
                 </div>
@@ -484,7 +509,7 @@ function SlideRender({
             {isClosing && slide.cta && (
               <div
                 className="mt-10 inline-flex px-10 py-5 rounded-full slide-body-lg font-semibold"
-                style={{ background: accentColor, color: palette.bg }}
+                style={{ background: accentColor, color: safePalette.bg }}
               >
                 {slide.cta}
               </div>
@@ -528,6 +553,7 @@ const SlidesDeckCard = ({ deck, hideCard = false, autoOpen = false, onClose }: P
 
   const [idx, setIdx] = useState(0);
   const [orientation, setOrientation] = useState<"horizontal" | "vertical">("horizontal");
+  const [portrait, setPortrait] = useState(false);
   const verticalScrollRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -610,71 +636,64 @@ const SlidesDeckCard = ({ deck, hideCard = false, autoOpen = false, onClose }: P
     }
   };
 
-  // Card preview
+  // Card preview — real slide-1 thumbnail rendered from the deck itself.
   const cover = deck.slides[0];
   return (
     <>
       {!hideCard && (
-      <div className="mt-3 group relative max-w-[420px] rounded-ios-xl overflow-hidden bg-zinc-950 border border-foreground/5 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] transition-all duration-700 hover:border-foreground/10">
+      <div className="slides-card-shell mt-3 group relative max-w-[420px] transition-all duration-300 hover:border-border/80">
         <button
           onClick={() => {
             setIdx(0);
             openPreview();
           }}
-          className="relative block w-full aspect-[16/9] overflow-hidden bg-zinc-900"
-          style={{ background: deck.palette.bg }}
+          className="slides-card-preview relative block w-full aspect-[16/9] overflow-hidden cursor-pointer"
         >
-          {cover?.image && (
-            <img loading="lazy" decoding="async"
-              src={cover.image}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover opacity-60 scale-110 group-hover:scale-100 transition-transform duration-1000"
-            />
+          {cover ? (
+            <div className="absolute inset-0 pointer-events-none">
+              <ScaledSlide>
+                <SlideRender slide={cover} palette={deck.palette} dir={dir} />
+              </ScaledSlide>
+            </div>
+          ) : (
+            <div className="absolute inset-0" style={{ background: deck.palette.bg }} />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent pointer-events-none" />
-          <div className="absolute top-4 right-4 inline-flex items-center gap-1 rounded-full bg-background/50 backdrop-blur px-2.5 py-1 text-[11px] font-medium text-foreground opacity-0 group-hover:opacity-100 transition">
+          <div className="absolute top-2.5 end-2.5 inline-flex items-center gap-1 rounded-full bg-background/70 backdrop-blur px-2.5 py-1 text-[11px] font-medium text-foreground opacity-0 group-hover:opacity-100 transition">
             <Maximize2 className="w-3 h-3" /> Open
           </div>
         </button>
 
-        <div className="px-6 pb-6 pt-4 flex flex-col gap-3">
-          <button
-            onClick={() => {
-              setIdx(0);
-              openPreview();
-            }}
-              data-slides-preview-button
-            style={{ backgroundColor: "#ffffff", color: "#000000" }}
-            className="w-full flex items-center justify-center gap-2 py-3.5 font-semibold rounded-2xl transition-all active:scale-[0.97] hover:brightness-95 shadow-lg text-[14px] tracking-tight"
-          >
-            <Maximize2 className="w-4 h-4" />
-            Open in preview
-          </button>
+        <div className="px-4 pb-4 pt-3 flex flex-col gap-2.5">
+          <div className="flex items-center justify-between gap-2">
+            <span className="min-w-0 truncate text-sm font-semibold text-foreground">{deck.title}</span>
+            <span className="shrink-0 text-[11px] text-muted-foreground">
+              {total} {total === 1 ? "slide" : "slides"}
+            </span>
+          </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                setIdx(0);
+                openPreview();
+              }}
+              data-slides-preview-button
+              className="slides-card-button slides-card-button--accent flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium active:scale-[0.98]"
+            >
+              <Maximize2 className="w-4 h-4" />
+              Open
+            </button>
             <button
               onClick={handlePptx}
               disabled={exportingPptx}
-              className="flex-1 flex items-center justify-center gap-2 py-3 bg-zinc-900 text-zinc-400 hover:text-foreground font-medium rounded-2xl border border-foreground/5 transition-all hover:bg-zinc-800 active:scale-[0.97] disabled:opacity-50 text-[13px]"
+              className="slides-card-button slides-card-button--secondary flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium active:scale-[0.98] disabled:opacity-50"
             >
               {exportingPptx ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                <Download className="w-3.5 h-3.5" />
+                <Download className="w-4 h-4" />
               )}
-              PPTX
-            </button>
-            <button
-              onClick={handleHtml}
-              disabled={exportingHtml}
-              aria-label="HTML"
-              className="w-11 h-11 flex items-center justify-center bg-zinc-900 text-zinc-400 hover:text-foreground rounded-2xl border border-foreground/5 transition-all hover:bg-zinc-800 active:scale-[0.97] disabled:opacity-50"
-            >
-              {exportingHtml ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <FileCode2 className="w-4 h-4" />
-              )}
+              Download
             </button>
           </div>
         </div>
@@ -689,40 +708,34 @@ const SlidesDeckCard = ({ deck, hideCard = false, autoOpen = false, onClose }: P
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <header className="flex items-center justify-between px-4 py-3 gap-2">
-              <div className="flex items-center gap-3 min-w-0">
-                <span className="text-xs font-mono text-foreground/60">
-                  {idx + 1} / {total}
-                </span>
-                <span className="text-sm font-semibold text-foreground truncate">{deck.title}</span>
-              </div>
-              <div className="flex items-center gap-1.5 shrink-0">
-                <div className="flex items-center rounded-full bg-foreground/10 p-0.5">
-                  <button
-                    onClick={() => setOrientation("horizontal")}
-                    aria-label="Horizontal scroll"
-                    title="Horizontal"
-                    className={`h-8 px-2.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition ${orientation === "horizontal" ? "bg-foreground/10 text-foreground" : "text-foreground/70 hover:text-foreground"}`}
-                  >
-                    <MoveHorizontal className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={() => setOrientation("vertical")}
-                    aria-label="Vertical scroll"
-                    title="Vertical"
-                    className={`h-8 px-2.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition ${orientation === "vertical" ? "bg-foreground/10 text-foreground" : "text-foreground/70 hover:text-foreground"}`}
-                  >
-                    <MoveVertical className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-                <button
-                  onClick={closePreview}
-                  className="h-9 w-9 rounded-full bg-foreground/10 hover:bg-foreground/20 text-foreground flex items-center justify-center"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </header>
+            {/* Floating circular back button — the only header control. */}
+            <button
+              onClick={closePreview}
+              aria-label="Back"
+              className="fixed top-[calc(env(safe-area-inset-top)+12px)] left-4 z-20 h-10 w-10 rounded-full bg-foreground/10 backdrop-blur hover:bg-foreground/20 text-foreground flex items-center justify-center"
+            >
+              <ArrowLeft className="w-4.5 h-4.5" />
+            </button>
+            {/* Scroll-direction toggle — floating, not part of a header/title bar. */}
+            <div className="fixed top-[calc(env(safe-area-inset-top)+12px)] right-4 z-20 flex items-center rounded-full bg-foreground/10 backdrop-blur p-0.5">
+              <button
+                onClick={() => setOrientation("horizontal")}
+                aria-label="Horizontal scroll"
+                title="Horizontal"
+                className={`h-8 px-2.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition ${orientation === "horizontal" ? "bg-foreground/10 text-foreground" : "text-foreground/70 hover:text-foreground"}`}
+              >
+                <MoveHorizontal className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => setOrientation("vertical")}
+                aria-label="Vertical scroll"
+                title="Vertical"
+                className={`h-8 px-2.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition ${orientation === "vertical" ? "bg-foreground/10 text-foreground" : "text-foreground/70 hover:text-foreground"}`}
+              >
+                <MoveVertical className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <div className="h-[calc(env(safe-area-inset-top)+56px)] shrink-0" aria-hidden />
 
             {orientation === "horizontal" ? (
               <div className="flex-1 flex items-center justify-center px-3 sm:px-10 pb-4 relative">
@@ -733,7 +746,7 @@ const SlidesDeckCard = ({ deck, hideCard = false, autoOpen = false, onClose }: P
                 >
                   <ChevronLeft />
                 </button>
-                <div className="relative w-full max-w-5xl aspect-[16/9] rounded-2xl overflow-hidden">
+                <div className={`relative w-full ${portrait ? "max-w-md aspect-[9/16]" : "max-w-5xl aspect-[16/9]"} rounded-2xl overflow-hidden`}>
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={idx}
@@ -743,8 +756,8 @@ const SlidesDeckCard = ({ deck, hideCard = false, autoOpen = false, onClose }: P
                       transition={{ duration: 0.25 }}
                       className="absolute inset-0"
                     >
-                      <ScaledSlide>
-                        <SlideRender slide={deck.slides[idx]} palette={deck.palette} dir={dir} />
+                      <ScaledSlide portrait={portrait}>
+                        <SlideRender slide={deck.slides[idx]} palette={deck.palette} dir={dir} portrait={portrait} />
                       </ScaledSlide>
                     </motion.div>
                   </AnimatePresence>
@@ -770,10 +783,10 @@ const SlidesDeckCard = ({ deck, hideCard = false, autoOpen = false, onClose }: P
                       ref={(el) => {
                         slideRefs.current[i] = el;
                       }}
-                      className="w-full max-w-5xl aspect-[16/9] rounded-2xl overflow-hidden snap-center shrink-0"
+                      className={`w-full ${portrait ? "max-w-md aspect-[9/16]" : "max-w-5xl aspect-[16/9]"} rounded-2xl overflow-hidden snap-center shrink-0`}
                     >
-                      <ScaledSlide>
-                        <SlideRender slide={s} palette={deck.palette} dir={dir} />
+                      <ScaledSlide portrait={portrait}>
+                        <SlideRender slide={s} palette={deck.palette} dir={dir} portrait={portrait} />
                       </ScaledSlide>
                     </div>
                   ))}
@@ -804,6 +817,43 @@ const SlidesDeckCard = ({ deck, hideCard = false, autoOpen = false, onClose }: P
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Bottom bar — always visible, Download + portrait/landscape toggle. */}
+            <div
+              className="shrink-0 flex items-center justify-center gap-3 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom)+1rem)] border-t border-foreground/10"
+              style={{
+                background: "hsl(var(--foreground) / 0.09)",
+                backdropFilter: "blur(22px) saturate(180%) brightness(1.06)",
+                WebkitBackdropFilter: "blur(22px) saturate(180%) brightness(1.06)",
+              }}
+            >
+              <button
+                type="button"
+                onClick={handlePptx}
+                disabled={exportingPptx}
+                className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-full text-sm font-semibold tracking-wide transition bg-foreground text-background hover:bg-foreground/90 disabled:opacity-50"
+              >
+                {exportingPptx ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Download className="w-4 h-4" />
+                )}
+                Download
+              </button>
+              <button
+                type="button"
+                onClick={() => setPortrait((p) => !p)}
+                aria-label={portrait ? "Switch to landscape" : "Switch to portrait"}
+                className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-full text-sm font-semibold tracking-wide transition bg-foreground/10 hover:bg-foreground/18 text-foreground border border-foreground/10"
+              >
+                {portrait ? (
+                  <RectangleHorizontal className="w-4 h-4" />
+                ) : (
+                  <RectangleVertical className="w-4 h-4" />
+                )}
+                {portrait ? "Landscape" : "Portrait"}
+              </button>
             </div>
           </motion.div>
         )}

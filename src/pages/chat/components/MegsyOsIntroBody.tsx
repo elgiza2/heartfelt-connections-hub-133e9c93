@@ -92,7 +92,7 @@ export default function MegsyOsIntroBody({
           <button
             onClick={() => onClose()}
             aria-label="Back"
-            className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-foreground/90 hover:bg-accent hover:text-accent-foreground active:scale-95 transition"
+            className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-foreground/90 hover:bg-accent hover:text-accent-foreground transition"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
@@ -147,13 +147,13 @@ export default function MegsyOsIntroBody({
         <div className="shrink-0 px-5 pt-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] border-t border-border/60 bg-background/95 backdrop-blur-md grid grid-cols-2 gap-3">
           <button
             onClick={() => onClose()}
-            className="py-3.5 rounded-full bg-card/60 text-foreground border border-border/60 font-semibold text-[14px] hover:bg-accent hover:text-accent-foreground active:scale-[0.98] transition-all"
+            className="py-3.5 rounded-full bg-card/60 text-foreground border border-border/60 font-semibold text-[14px] hover:bg-accent hover:text-accent-foreground transition-all"
           >
             Maybe later
           </button>
           <button
             onClick={handleStart}
-            className="py-3.5 bg-primary text-primary-foreground font-bold text-[14px] rounded-full hover:opacity-90 active:scale-[0.98] transition-all"
+            className="py-3.5 bg-primary text-primary-foreground font-bold text-[14px] rounded-full hover:opacity-90 transition-all"
           >
             {isProPlusPlan() ? "Start Now →" : "Upgrade to Pro →"}
           </button>

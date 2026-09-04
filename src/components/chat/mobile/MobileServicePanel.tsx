@@ -121,7 +121,7 @@ export function ServiceRow({ label, value, onClick, trailing }: RowProps) {
     <button
       type="button"
       onClick={onClick}
-      className="w-full h-11 flex items-center justify-between px-4 rounded-full border border-foreground/12 text-foreground active:scale-[0.98] transition-transform"
+      className="w-full h-11 flex items-center justify-between px-4 rounded-full border border-foreground/12 text-foreground transition-transform"
       style={{
         background: "hsl(var(--foreground) / 0.07)",
         backdropFilter: "blur(16px) saturate(170%)",

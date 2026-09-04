@@ -252,7 +252,7 @@ export default function ComposerModelMenu({
         className={
           variant === "segment"
             ? `${glassModelMenu.triggerSegment} justify-center ${triggerClassName || ""}`
-            : `group inline-flex h-11 md:h-9 max-w-[62vw] items-center justify-center gap-1 rounded-full px-1 text-[16px] font-semibold text-foreground hover:text-foreground active:scale-95 transition-all outline-none ${triggerClassName || ""}`
+            : `group inline-flex h-11 md:h-9 max-w-[62vw] items-center justify-center gap-1 rounded-full px-1 text-[16px] font-semibold text-foreground hover:text-foreground transition-all outline-none ${triggerClassName || ""}`
         }
         style={
           variant === "segment"
@@ -354,7 +354,7 @@ export default function ComposerModelMenu({
                           marginTop: 0,
                           opacity: locked ? 0.5 : 1,
                         }}
-                        className="flex w-full items-center gap-2.5 rounded-[20px] px-3 py-2.5 text-right transition-colors tier-row active:scale-[0.985]"
+                        className="flex w-full items-center gap-2.5 rounded-[20px] px-3 py-2.5 text-right transition-colors tier-row"
                       >
                         <span className="min-w-0 flex-1">
                           <span className="flex items-center gap-1.5">

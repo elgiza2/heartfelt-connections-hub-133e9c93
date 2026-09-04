@@ -24,7 +24,7 @@ export default function VideoToolsBar() {
   };
 
   const chip = (active: boolean) =>
-    `inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-[12.5px] font-medium border transition active:scale-[0.97] ${
+    `inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-[12.5px] font-medium border transition ${
       active
         ? "bg-foreground/[0.16] border-foreground/25 text-foreground"
         : "bg-foreground/[0.07] border-foreground/10 text-foreground/75 hover:text-foreground"
