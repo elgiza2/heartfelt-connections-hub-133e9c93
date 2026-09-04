@@ -86,7 +86,7 @@ import { Message, MessageContent } from "@/components/prompt-kit/message";
 import ThinkingTrace from "./ThinkingTrace";
 import { estimateTokens, formatTokens } from "@/pages/chat/utils/estimateTokens";
 import { SecureVideo } from "@/components/chat/media/SecureVideo";
-import { stripPlanClaims } from "@/pages/chat/chatUtils";
+import { stripPlanClaims, sanitizeLeakedToolText } from "@/pages/chat/chatUtils";
 
 
 interface ChatMessageProps {
@@ -1041,7 +1041,7 @@ const ChatMessage = ({
     // Final render-time guard: no assistant text may claim a plan / paid status,
     // regardless of which pipeline (chat, long-run, replay) produced it.
     return {
-      displayContent: stripPlanClaims(normalized.cleaned),
+      displayContent: sanitizeLeakedToolText(stripPlanClaims(normalized.cleaned)),
       inlineImages: normalized.extractedImages,
     };
   }, [content, role]);

@@ -229,9 +229,8 @@ export default function MobileChatHeader({
       <div
         data-testid="mobile-chat-header"
         style={{ top: "var(--promo-banner-h, 0px)" }}
-        className={`mobile-chat-header md:hidden fixed inset-x-0 z-30 flex items-center gap-2 px-3 py-1.5 min-h-[44px] pt-[max(env(safe-area-inset-top),0.25rem)] pointer-events-none [&>*]:pointer-events-auto border-0 transition-colors duration-200 ${
-          scrolled ? "bg-background pointer-events-auto" : "bg-transparent"
-        }`}
+        className="mobile-chat-header md:hidden fixed inset-x-0 z-30 flex items-center gap-2 px-3 py-1.5 min-h-[44px] pt-[max(env(safe-area-inset-top),0.25rem)] pointer-events-none [&>*]:pointer-events-auto border-0 bg-background pointer-events-auto"
+
 
       >
         <button
