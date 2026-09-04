@@ -232,17 +232,18 @@
   [data-skin="claude"] .chat-surface-dark[data-chat-main="true"] { background: hsl(var(--background)) !important; }
   [data-skin="claude"] .chat-surface-dark[data-chat-main="true"][data-chat-empty="true"] { background: transparent !important; }
 
-  /* Assistant prose — Claude serif */
+  /* Assistant prose — compact, legible sans (serif at 17px read far too big) */
   [data-skin="claude"] .prose-chat,
   [data-skin="claude"] .prose-chat * {
-    font-family: 'Instrument Serif', 'Source Serif 4', Georgia, ui-serif, serif !important;
+    font-family: ui-sans-serif, -apple-system, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
   }
   [data-skin="claude"] .prose-chat {
-    font-size: 1.0625rem;
-    line-height: 1.75;
+    font-size: 0.9375rem;
+    line-height: 1.65;
     color: #ECECEC;
-    letter-spacing: 0.005em;
+    letter-spacing: 0;
   }
+
   [data-skin="claude"] .prose-chat code,
   [data-skin="claude"] .prose-chat pre,
   [data-skin="claude"] .prose-chat pre * {
