@@ -1954,25 +1954,53 @@ const ChatMessage = ({
             {/* Optional artifact slot (e.g. docs/slides card) — rendered before action buttons */}
             {bottomSlot && !isStreaming && <div className="mt-3">{bottomSlot}</div>}
 
-            {/* Action buttons: like + copy + dislike only — quiet, no shadows, no springy motion */}
+            {/* Action buttons: like + copy + dislike — flat, no shadow, small playful feedback */}
             {!isStreaming && !hasRunningTool && content && !showSlidesInfoBox && !hideActions && (
               <AIMessageActions className="mt-1.5 gap-0">
                 <AIMessageAction
-                  onClick={() => handleLikeAction(liked === true ? null : true)}
+                  onClick={() => {
+                    const next = liked === true ? null : true;
+                    handleLikeAction(next);
+                    if (next === true) {
+                      setBurst("like");
+                      window.setTimeout(() => setBurst(null), 900);
+                    }
+                  }}
                   tooltip="Like"
-                  className={`h-7 w-7 rounded-md bg-transparent shadow-none ${
+                  className={`relative h-7 w-7 rounded-md border-0 bg-transparent shadow-none hover:bg-transparent ${
                     liked === true
                       ? "text-primary"
                       : "text-muted-foreground/70 hover:text-foreground"
                   }`}
                 >
-                  <ThumbsUp className="w-[15px] h-[15px]" strokeWidth={1.75} />
+                  <motion.span
+                    className="inline-flex"
+                    animate={liked === true ? { scale: [1, 1.35, 1], rotate: [0, -14, 0] } : { scale: 1 }}
+                    transition={{ duration: 0.36, ease: [0.22, 0.9, 0.3, 1] }}
+                  >
+                    <ThumbsUp className="w-[15px] h-[15px]" strokeWidth={1.75} />
+                  </motion.span>
+                  <AnimatePresence>
+                    {burst === "like" && (
+                      <motion.span
+                        key="like-burst"
+                        initial={{ opacity: 0, y: 0, scale: 0.6 }}
+                        animate={{ opacity: 1, y: -18, scale: 1 }}
+                        exit={{ opacity: 0, y: -26, scale: 0.8 }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
+                        className="pointer-events-none absolute -top-1 text-[15px] leading-none"
+                        aria-hidden
+                      >
+                        😄
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
                 </AIMessageAction>
 
                 <AIMessageAction
                   onClick={handleCopy}
                   tooltip={copied ? "Copied" : "Copy"}
-                  className="h-7 w-7 rounded-md bg-transparent text-muted-foreground/70 shadow-none hover:text-foreground"
+                  className="h-7 w-7 rounded-md border-0 bg-transparent text-muted-foreground/70 shadow-none hover:bg-transparent hover:text-foreground"
                 >
                   {copied ? (
                     <Check className="w-[15px] h-[15px] text-emerald-500" strokeWidth={1.75} />
@@ -1981,19 +2009,60 @@ const ChatMessage = ({
                   )}
                 </AIMessageAction>
 
-                <AIMessageAction
-                  onClick={() => handleLikeAction(liked === false ? null : false)}
-                  tooltip="Dislike"
-                  className={`h-7 w-7 rounded-md bg-transparent shadow-none ${
-                    liked === false
-                      ? "text-destructive"
-                      : "text-muted-foreground/70 hover:text-foreground"
-                  }`}
-                >
-                  <ThumbsDown className="w-[15px] h-[15px]" strokeWidth={1.75} />
-                </AIMessageAction>
+                <AnimatePresence initial={false}>
+                  {liked !== true && (
+                    <motion.div
+                      key="dislike"
+                      initial={{ opacity: 0, scale: 0.85 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.85 }}
+                      transition={{ duration: 0.18, ease: [0.22, 0.9, 0.3, 1] }}
+                    >
+                      <AIMessageAction
+                        onClick={() => {
+                          const next = liked === false ? null : false;
+                          handleLikeAction(next);
+                          if (next === false) {
+                            setBurst("dislike");
+                            window.setTimeout(() => setBurst(null), 900);
+                          }
+                        }}
+                        tooltip="Dislike"
+                        className={`relative h-7 w-7 rounded-md border-0 bg-transparent shadow-none hover:bg-transparent ${
+                          liked === false
+                            ? "text-destructive"
+                            : "text-muted-foreground/70 hover:text-foreground"
+                        }`}
+                      >
+                        <motion.span
+                          className="inline-flex"
+                          animate={liked === false ? { scale: [1, 1.3, 1], rotate: [0, 14, 0] } : { scale: 1 }}
+                          transition={{ duration: 0.36, ease: [0.22, 0.9, 0.3, 1] }}
+                        >
+                          <ThumbsDown className="w-[15px] h-[15px]" strokeWidth={1.75} />
+                        </motion.span>
+                        <AnimatePresence>
+                          {burst === "dislike" && (
+                            <motion.span
+                              key="dislike-burst"
+                              initial={{ opacity: 0, y: 0, scale: 0.6 }}
+                              animate={{ opacity: 1, y: -18, scale: 1 }}
+                              exit={{ opacity: 0, y: -26, scale: 0.8 }}
+                              transition={{ duration: 0.5, ease: "easeOut" }}
+                              className="pointer-events-none absolute -top-1 text-[15px] leading-none"
+                              aria-hidden
+                            >
+                              😠
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
+                      </AIMessageAction>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </AIMessageActions>
             )}
+
 
             {!isStreaming && !hasRunningTool && content && (
               <ReactionsRow
