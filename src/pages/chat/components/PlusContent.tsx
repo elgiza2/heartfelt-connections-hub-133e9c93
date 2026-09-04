@@ -146,7 +146,6 @@ const PlusMain = (p: PlusContentProps) => {
   const tiles: Tile[] = [
     { id: "camera", label: "Camera", Icon: Aperture, onClick: closeThen(() => p.cameraInputRef.current?.click()) },
     { id: "photos", label: "Images", Icon: Images, onClick: closeThen(() => p.imageInputRef.current?.click()) },
-    { id: "file", label: "Files", Icon: Paperclip, onClick: closeThen(() => p.fileInputRef.current?.click()) },
   ];
 
   type RowItem = {
@@ -185,46 +184,38 @@ const PlusMain = (p: PlusContentProps) => {
       className="plus-row w-full flex items-center gap-3 px-2 py-2 rounded-[12px] text-start border-0 bg-transparent"
     >
       <span
-        className="shrink-0 grid place-items-center rounded-[10px] transition-colors duration-200"
-        style={{
-          width: 32,
-          height: 32,
-          background: item.active ? "hsl(var(--primary) / 0.12)" : "hsl(var(--foreground) / 0.05)",
-        }}
+        className={`shrink-0 grid place-items-center h-8 w-8 rounded-[10px] transition-colors duration-200 ${
+          item.active ? "bg-primary/10" : "bg-muted"
+        }`}
       >
         <item.Icon
-          className="w-[16px] h-[16px]"
+          className={`h-4 w-4 ${item.active ? "text-primary" : "text-foreground/75"}`}
           strokeWidth={1.8}
-          style={{ color: item.active ? "hsl(var(--primary))" : "hsl(var(--foreground) / 0.75)" }}
         />
       </span>
       <span className="flex-1 min-w-0 flex flex-col gap-[3px]">
-        <span className="text-[14px] font-medium leading-none" style={{ color: "hsl(var(--foreground) / 0.94)" }}>
+        <span className="text-[14px] font-medium leading-none text-foreground">
           {item.label}
         </span>
         {item.desc && (
-          <span className="text-[11.5px] leading-none truncate" style={{ color: "hsl(var(--foreground) / 0.42)" }}>
+          <span className="text-[11.5px] leading-none truncate text-muted-foreground">
             {item.desc}
           </span>
         )}
       </span>
       {item.value && (
         <span
-          className="shrink-0 text-[11.5px] font-medium rounded-full px-2 py-[3px]"
-          style={{
-            color: item.active ? "hsl(var(--primary))" : "hsl(var(--foreground) / 0.5)",
-            background: item.active ? "hsl(var(--primary) / 0.1)" : "hsl(var(--foreground) / 0.05)",
-          }}
+          className={`shrink-0 text-[11.5px] font-medium rounded-full px-2 py-[3px] ${
+            item.active ? "text-primary bg-primary/10" : "text-muted-foreground bg-muted"
+          }`}
         >
           {item.value}
         </span>
       )}
       <ChevronLeft
-        className="shrink-0 w-[15px] h-[15px] transition-transform duration-200"
-        style={{
-          color: "hsl(var(--foreground) / 0.3)",
-          transform: expanded ? "rotate(-90deg)" : "rotate(180deg)",
-        }}
+        className={`shrink-0 h-[15px] w-[15px] text-muted-foreground/70 transition-transform duration-200 ${
+          expanded ? "-rotate-90" : "rotate-180"
+        }`}
       />
     </button>
   );
@@ -283,11 +274,10 @@ const PlusMain = (p: PlusContentProps) => {
               data-no-neo
               type="button"
               onClick={t.onClick}
-              className="kimi-tile flex flex-col items-center justify-center gap-1.5 rounded-[14px] border-0"
-              style={{ height: 68, background: "hsl(var(--foreground) / 0.045)" }}
+              className="kimi-tile flex h-[68px] flex-col items-center justify-center gap-1.5 rounded-[14px] border-0 bg-muted"
             >
-              <t.Icon className="w-[19px] h-[19px]" strokeWidth={1.7} style={{ color: "hsl(var(--foreground) / 0.8)" }} />
-              <span className="text-[11.5px] font-medium leading-none" style={{ color: "hsl(var(--foreground) / 0.7)" }}>
+              <t.Icon className="h-[19px] w-[19px] text-foreground/80" strokeWidth={1.7} />
+              <span className="text-[11.5px] font-medium leading-none text-foreground/70">
                 {t.label}
               </span>
             </button>
