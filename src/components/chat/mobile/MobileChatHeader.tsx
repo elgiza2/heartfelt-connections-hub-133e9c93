@@ -164,18 +164,9 @@ export default function MobileChatHeader({
   const [menuView, setMenuView] = useState<MenuView>("main");
   const navigate = useNavigate();
 
-  // Once the message list is scrolled the header sits on top of content, so it
-  // takes the page background colour instead of staying transparent.
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const el = scrollContainerRef?.current;
-    const read = () =>
-      setScrolled((el ? el.scrollTop : window.scrollY) > 4);
-    read();
-    const target: HTMLElement | Window = el ?? window;
-    target.addEventListener("scroll", read, { passive: true });
-    return () => target.removeEventListener("scroll", read);
-  }, [scrollContainerRef]);
+  // The header always uses the page background so it blends seamlessly with
+  // the chat surface — no colour change on scroll.
+
 
   const lang = useUserLang();
 
