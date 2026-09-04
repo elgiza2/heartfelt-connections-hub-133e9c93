@@ -26,10 +26,14 @@ export function ComposerIntegrationsButton({ onClick, label = "Integrations" }: 
   const extra = apps.length - shown.length;
 
   useEffect(() => {
-    const warm = window.requestIdleCallback ?? ((cb: IdleRequestCallback) => window.setTimeout(cb, 300));
-    const id = warm(() => prefetchIntegrationsSheet());
+    if (window.requestIdleCallback) {
+      const idleId = window.requestIdleCallback(prefetchIntegrationsSheet);
+      return () => window.cancelIdleCallback(idleId);
+    }
+
+    const timeoutId = window.setTimeout(prefetchIntegrationsSheet, 300);
     return () => {
-      window.cancelIdleCallback?.(id);
+      window.clearTimeout(timeoutId);
     };
   }, []);
 
