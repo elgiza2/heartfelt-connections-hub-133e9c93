@@ -12,7 +12,10 @@ const PATTERNS: Record<Tone, number | number[]> = {
   error: [25, 40, 25, 40, 25],
 };
 
-let muted = false;
+// Device vibration is disabled product-wide: users reported the buzz on
+// send / tap / streaming as unpleasant. Kept as a no-op so callers and the
+// settings toggle keep working without touching every call site.
+let muted = true;
 
 export function setHapticsMuted(value: boolean) {
   muted = value;
@@ -23,25 +26,12 @@ export function setHapticsMuted(value: boolean) {
   }
 }
 
-try {
-  if (typeof localStorage !== "undefined") {
-    muted = localStorage.getItem("megsy.haptics.muted") === "1";
-  }
-} catch {
-  /* noop */
+export function haptic(_tone: Tone = "tap") {
+  /* vibration disabled by design */
+  void PATTERNS;
+  void muted;
 }
 
-export function haptic(tone: Tone = "tap") {
-  if (muted) return;
-  if (typeof navigator === "undefined") return;
-  const v = (navigator as Navigator & { vibrate?: (p: number | number[]) => boolean }).vibrate;
-  if (typeof v !== "function") return;
-  try {
-    v.call(navigator, PATTERNS[tone]);
-  } catch {
-    /* noop */
-  }
-}
 
 /** iOS-feel spring presets for framer-motion `transition`. */
 export const iosSpring = {
