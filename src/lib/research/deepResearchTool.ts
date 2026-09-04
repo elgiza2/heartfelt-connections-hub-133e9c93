@@ -1,6 +1,10 @@
 /** Browser client for the single native Deep Research stream. */
 import type { WebSource } from "@/lib/search/webSearchClient";
 import { callServerEndpoint } from "@/lib/api/callServerEndpoint";
+import { RESEARCH_STEPS, type ResearchStepId } from "@/lib/research/deepResearchShared";
+
+export { RESEARCH_STEPS };
+export type { ResearchStepId };
 
 export const DEEP_RESEARCH_TOOL = {
   name: "deep_research",
@@ -33,6 +37,8 @@ export interface DeepResearchToolRun {
   onDelta?: (chunk: string) => void;
   onReasoning?: (chunk: string) => void;
   onSources?: (sources: WebSource[]) => void;
+  /** Fires whenever the run advances to the next entry in RESEARCH_STEPS. */
+  onStep?: (stepId: ResearchStepId) => void;
   signal?: AbortSignal;
 }
 
@@ -43,6 +49,7 @@ function gatewayError(data: unknown, fallback: string): string {
 
 export async function runDeepResearchTool(run: DeepResearchToolRun): Promise<string> {
   run.onStatus?.("Planning the investigation…");
+  run.onStep?.("plan");
   const response = await callServerEndpoint("deep-research", {
     query: run.query,
     context: run.context,
@@ -60,6 +67,8 @@ export async function runDeepResearchTool(run: DeepResearchToolRun): Promise<str
   let buffer = "";
   let report = "";
   let searches = 0;
+  let reachedRead = false;
+  let reachedSynthesize = false;
 
   while (true) {
     const { done, value } = await reader.read();
@@ -83,10 +92,19 @@ export async function runDeepResearchTool(run: DeepResearchToolRun): Promise<str
 
       if (event.type === "response.web_search_call.searching") {
         searches += 1;
+        run.onStep?.("search");
         run.onStatus?.(`Searching and checking sources… (${searches})`);
       } else if (event.type === "response.reasoning_summary_text.delta") {
+        if (!reachedRead) {
+          reachedRead = true;
+          run.onStep?.("read");
+        }
         run.onReasoning?.(String(event.delta ?? ""));
       } else if (event.type === "response.output_text.delta") {
+        if (!reachedSynthesize) {
+          reachedSynthesize = true;
+          run.onStep?.("synthesize");
+        }
         const chunk = String(event.delta ?? "");
         report += chunk;
         run.onDelta?.(chunk);
@@ -110,6 +128,7 @@ export async function runDeepResearchTool(run: DeepResearchToolRun): Promise<str
   if (!report.trim()) {
     throw new Error("Deep Research completed without a report. Please try again.");
   }
+  run.onStep?.("report");
   run.onStatus?.("Research complete");
   return report.trim();
 }

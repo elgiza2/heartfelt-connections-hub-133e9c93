@@ -1,7 +1,7 @@
 /** @doc Full-screen preview of a deep-research report. */
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, RefreshCw } from "lucide-react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +14,7 @@ import { goBackOr } from "@/lib/navigation";
 import { ReportData, extractSources, ScrollProgress } from "@/components/research/templateUtils";
 import ResearchArticleTemplate from "@/components/research/ResearchLandingTemplate";
 import ResearchSources from "@/components/research/ResearchReportTabs";
+import { RESEARCH_STEPS, type ResearchStepId } from "@/lib/research/deepResearchShared";
 
 const ResearchPreviewPage = () => {
   const navigate = useNavigate();
@@ -24,6 +25,10 @@ const ResearchPreviewPage = () => {
   const isShareView = !!shareToken;
   const [data, setData] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [reloadNonce, setReloadNonce] = useState(0);
+  // Live run state (set by callers that navigate here mid-research).
+  const liveState = (location.state as { status?: "running" | "error"; activeStepId?: ResearchStepId; errorMessage?: string; onRetry?: () => void } | null) ?? null;
   const [exporting, setExporting] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
   const stateReport =
@@ -39,22 +44,31 @@ const ResearchPreviewPage = () => {
   };
 
   useEffect(() => {
+    setLoadError(null);
     // Public share view: load by share_token (no auth required).
     if (isShareView && shareToken) {
       (async () => {
-        const { data: row } = await supabase
-          .from("research_reports")
-          .select("query, report, images")
-          .eq("share_token", shareToken)
-          .maybeSingle();
-        if (row) {
-          setData({
-            query: row.query,
-            report: row.report,
-            images: (row.images as any) || [],
-          });
+        try {
+          const { data: row, error } = await supabase
+            .from("research_reports")
+            .select("query, report, images")
+            .eq("share_token", shareToken)
+            .maybeSingle();
+          if (error) throw error;
+          if (row) {
+            setData({
+              query: row.query,
+              report: row.report,
+              images: (row.images as any) || [],
+            });
+          } else {
+            setLoadError("This shared report could not be found.");
+          }
+        } catch {
+          setLoadError("Failed to load this report. Please try again.");
+        } finally {
+          setLoading(false);
         }
-        setLoading(false);
       })();
       return;
     }
@@ -92,9 +106,11 @@ const ResearchPreviewPage = () => {
       return;
     }
     (async () => {
+      try {
       const { data: user } = await supabase.auth.getUser();
       const uid = user.user?.id;
       if (!uid) {
+        setLoadError("Sign in to view this report.");
         setLoading(false);
         return;
       }
@@ -143,6 +159,7 @@ const ResearchPreviewPage = () => {
       }
 
       // 3) Fallback: reconstruct from messages of the conversation.
+      let reconstructed = false;
       if (conversationId) {
         const { data: convo } = await supabase
           .from("conversations")
@@ -165,15 +182,23 @@ const ResearchPreviewPage = () => {
               images: [] as string[],
             };
             setData(fresh);
+            reconstructed = true;
             try {
               sessionStorage.setItem(cacheKey, JSON.stringify(fresh));
             } catch {}
           }
         }
       }
-      setLoading(false);
+      if (!row && !reconstructed) {
+        setLoadError("Report not found.");
+      }
+      } catch {
+        setLoadError("Failed to load this report. Please try again.");
+      } finally {
+        setLoading(false);
+      }
     })();
-  }, [id, shareToken, stateReport]);
+  }, [id, shareToken, stateReport, reloadNonce]);
 
   const cleanReport = useMemo(() => (data ? normalizeResearchReport(data.report) : ""), [data]);
   const isRtl = cleanReport ? detectResearchReportDirection(cleanReport) === "rtl" : false;

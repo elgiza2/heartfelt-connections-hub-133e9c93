@@ -2,6 +2,7 @@ import AnimatedInput from "@/components/chat/AnimatedInput";
 import type { AgentDef, AgentModel } from "@/lib/agentRegistry";
 import type { ChatMode } from "../chatConstants";
 import { ComposerInlineSlot } from "./ComposerInlineSlot";
+import ComposerServiceQuickButton from "./ComposerServiceQuickButton";
 import {
   PENDING_COMPUTER_RUN,
   clearActiveComputerRun,
@@ -208,6 +209,15 @@ export function ComposerAnimatedInput(props: ComposerAnimatedInputProps) {
       }
       headerSlot={(props as any).activeServiceHeader ?? null}
       activeServiceSlot={(props as any).activeServiceSlot ?? null}
+      serviceTools={
+        <ComposerServiceQuickButton
+          chatMode={chatMode}
+          mediaModel={inlineSlotProps.mediaModel}
+          setMediaModel={inlineSlotProps.setMediaModel}
+          slidesTemplate={inlineSlotProps.slidesTemplate}
+          onOpenTemplatePicker={() => inlineSlotProps.setSlidesPickerOpen(true)}
+        />
+      }
     />
   );
 }

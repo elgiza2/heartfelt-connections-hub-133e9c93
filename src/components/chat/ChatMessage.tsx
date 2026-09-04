@@ -88,6 +88,8 @@ import ThinkingTrace from "./ThinkingTrace";
 import { estimateTokens, formatTokens } from "@/pages/chat/utils/estimateTokens";
 import { SecureVideo } from "@/components/chat/media/SecureVideo";
 import { stripPlanClaims, sanitizeLeakedToolText } from "@/pages/chat/chatUtils";
+import ChatFileCard from "@/components/chat/ChatFileCard";
+import type { ResearchStepId } from "@/lib/research/deepResearchShared";
 
 
 interface ChatMessageProps {
@@ -1272,17 +1274,7 @@ const ChatMessage = ({
           {attachedFiles && attachedFiles.length > 0 && (
             <div className="flex gap-2 mb-2 justify-end flex-wrap">
               {attachedFiles.map((f, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-muted text-xs text-foreground border border-border"
-                >
-                  {f.type === "link" ? (
-                    <Link2 className="w-3 h-3 text-muted-foreground" />
-                  ) : (
-                    <FileUp className="w-3 h-3 text-muted-foreground" />
-                  )}
-                  <span className="truncate max-w-[100px]">{f.name}</span>
-                </div>
+                <ChatFileCard key={i} file={f} />
               ))}
             </div>
           )}
@@ -1440,7 +1432,12 @@ const ChatMessage = ({
       isDeepResearch === true);
   // Deep Research reports collapse into a card once streaming completes; the
   // full report lives on the dedicated preview page behind the Open button.
-  const showResearchCard = looksLikeResearch && !isStreaming && content.trim().length > 200;
+  const researchStatus = (metadata?.researchStatus as "running" | "error" | "done" | undefined);
+  const researchStepId = metadata?.researchStepId as ResearchStepId | undefined;
+  const researchErrorMessage = metadata?.researchErrorMessage as string | undefined;
+  const showResearchCard =
+    looksLikeResearch &&
+    (researchStatus === "running" || researchStatus === "error" || (!isStreaming && content.trim().length > 200));
 
   const showNarration =
     role === "assistant" && isDeepResearch && narrations && narrations.length > 0;
@@ -1632,6 +1629,10 @@ const ChatMessage = ({
               report={content}
               images={images || []}
               sessionKey={researchSessionKey}
+              status={researchStatus}
+              activeStepId={researchStepId}
+              errorMessage={researchErrorMessage}
+              onRetry={onRegenerate}
             />
           </Suspense>
         ) : (
