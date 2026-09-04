@@ -104,13 +104,7 @@ export default function MediaSettingsMenu({ mode, open, onOpenChange, onChange }
         side="top"
         align="end"
         sideOffset={10}
-        className="z-[61] w-[min(360px,calc(100vw-16px))] rounded-[24px] border border-foreground/15 p-4 unified-menu-surface"
-        style={{
-          background: "hsl(var(--foreground) / 0.08)",
-          backdropFilter: "blur(24px) saturate(180%) brightness(1.05)",
-          boxShadow:
-            "inset 1px 1px 1px 0 hsl(var(--foreground) / 0.22), 0 18px 44px hsl(0 0% 0% / 0.4)",
-        }}
+        className="z-[61] w-[min(360px,calc(100vw-16px))] rounded-2xl border border-border bg-popover p-4 shadow-lg"
       >
         <MediaSettingsPanel mode={mode} onChange={onChange} showHeader />
       </AnimateDropdownMenuContent>
@@ -165,10 +159,7 @@ export function MediaSettingsPanel({
               {summary}
             </div>
           </div>
-          <span
-            className="shrink-0 text-[9.5px] uppercase tracking-[0.22em] text-foreground/85 font-semibold px-2.5 py-1 rounded-full border border-foreground/15"
-            style={{ background: "hsl(var(--foreground) / 0.1)" }}
-          >
+          <span className="shrink-0 text-[9.5px] uppercase tracking-[0.22em] text-foreground/85 font-semibold px-2.5 py-1 rounded-full bg-muted border border-border">
             {tx(isVideo ? "Video" : "Image")}
           </span>
         </div>
@@ -192,8 +183,8 @@ export function MediaSettingsPanel({
           role="switch"
           aria-checked={settings.autoPrompt !== false}
           onClick={() => update({ autoPrompt: !(settings.autoPrompt !== false) })}
-          className={`shrink-0 mt-0.5 relative inline-flex h-7 w-12 items-center rounded-full border border-foreground/15 transition-colors ${
-            settings.autoPrompt !== false ? "bg-foreground/30" : "bg-foreground/10"
+          className={`shrink-0 mt-0.5 relative inline-flex h-7 w-12 items-center rounded-full border border-border transition-colors ${
+            settings.autoPrompt !== false ? "bg-primary/70" : "bg-muted"
           }`}
         >
           <span
@@ -393,10 +384,7 @@ function Segmented({
   onChange: (id: string) => void;
 }) {
   return (
-    <div
-      className="inline-flex w-full p-1 rounded-xl border border-foreground/12"
-      style={{ background: "hsl(var(--foreground) / 0.06)" }}
-    >
+    <div className="inline-flex w-full p-1 rounded-xl border border-border bg-muted/50">
       {items.map((it) => {
         const active = it.id === value;
         return (
@@ -461,8 +449,7 @@ function AttachTile({
 }) {
   return (
     <div
-      className="flex items-start gap-2.5 py-2 px-3 rounded-xl border border-foreground/12 mb-1.5 last:mb-0"
-      style={{ background: "hsl(var(--foreground) / 0.06)" }}
+      className="flex items-start gap-2.5 py-2 px-3 rounded-xl border border-border bg-muted/50 mb-1.5 last:mb-0"
     >
       {icon && <div className="mt-0.5 shrink-0 text-foreground/55">{icon}</div>}
       <div className="min-w-0">
