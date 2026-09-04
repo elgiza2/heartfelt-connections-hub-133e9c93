@@ -32,6 +32,7 @@ import { visit, SKIP } from "unist-util-visit";
 import { toString } from "mdast-util-to-string";
 import { toast } from "sonner";
 import ThinkingLoader from "./ThinkingLoader";
+import SlidesGenerationProgress from "./SlidesGenerationProgress";
 import { type ParallelAgentTask } from "./ParallelAgentsPanel";
 import { detectLang, langDir } from "@/lib/detectLang";
 import { parseLearnSegments, hasLearnCards } from "@/lib/learnCardParser";
@@ -1500,15 +1501,19 @@ const ChatMessage = ({
           />
         )}
         {showLiveThinkingTrace && (
-          <ThinkingTrace
-            status={searchStatus}
-            steps={[...(narrations || []), ...(activeThinkingSteps || [])]}
-            text={reasoning}
-            active
-            tool={activeToolName}
-            running={hasRunningTool || toolActivity?.status === "running"}
-            className={content ? "mb-2" : ""}
-          />
+          isSlidesMode ? (
+            <SlidesGenerationProgress status={searchStatus} className={content ? "mb-2" : ""} />
+          ) : (
+            <ThinkingTrace
+              status={searchStatus}
+              steps={[...(narrations || []), ...(activeThinkingSteps || [])]}
+              text={reasoning}
+              active
+              tool={activeToolName}
+              running={hasRunningTool || toolActivity?.status === "running"}
+              className={content ? "mb-2" : ""}
+            />
+          )
         )}
         {role === "assistant" &&
           reasoning &&
