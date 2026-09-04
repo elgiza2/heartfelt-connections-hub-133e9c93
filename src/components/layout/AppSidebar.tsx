@@ -1252,11 +1252,12 @@ const AppSidebar = ({
               onClick={handleNewChat}
               className="theme-fixed mobile-sidebar-footer-pill mobile-sidebar-footer-text grid place-items-center active:scale-90 shrink-0"
               style={{
-                height: mobileScrolled ? "40px" : "40px",
-                width: mobileScrolled ? "40px" : "40px",
+                height: "40px",
+                width: "40px",
                 borderRadius: mobileScrolled ? "14px" : "9999px",
-                marginLeft: mobileScrolled ? "6px" : "10px",
+                marginLeft: mobileScrolled ? "14px" : "18px",
               }}
+
               title={isBuildMode ? "New project" : "New chat"}
               aria-label="New chat"
             >
