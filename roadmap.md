@@ -1,3 +1,11 @@
 # Roadmap
 
-All requested items complete: haptics removed, header matches chat, smaller chat text, clean chips and message actions, ordered thinking trace, image tools row, model/slides pickers in composer, Files button removed, in-chat file cards with preview, slides fixes + viewer chrome + real progress, deep research fixed with steps and retry.
+- [ ] Stop first-message page refresh and remove disruptive chat motion
+- [ ] Unify thinking UI and remove slide-specific four-step progress
+- [ ] Repair deep research, coding, image, and slides request flows without Lovable AI
+- [ ] Redesign the Plus menu, chips, model/agent pickers, and integrations loading
+- [ ] Simplify message actions and stabilize the user-message action menu
+- [ ] Refine chat typography, composer send button, and empty-state copy
+- [ ] Normalize mobile sidebar behavior and page-specific sidebar buttons
+- [ ] Clean up settings, referrals, and pricing layouts
+- [ ] Verify key mobile flows with the provided test account
