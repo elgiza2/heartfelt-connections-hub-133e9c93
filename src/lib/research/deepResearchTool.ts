@@ -70,6 +70,52 @@ export async function runDeepResearchTool(run: DeepResearchToolRun): Promise<str
   let reachedRead = false;
   let reachedSynthesize = false;
 
+  const consumeLine = (line: string) => {
+    if (!line.startsWith("data:")) return;
+    const raw = line.slice(5).trim();
+    if (!raw || raw === "[DONE]") return;
+
+    let event: Record<string, any>;
+    try {
+      event = JSON.parse(raw);
+    } catch {
+      return;
+    }
+
+    if (event.type === "response.web_search_call.searching") {
+      searches += 1;
+      run.onStep?.("search");
+      run.onStatus?.(`Searching and checking sources… (${searches})`);
+    } else if (event.type === "response.reasoning_summary_text.delta") {
+      if (!reachedRead) {
+        reachedRead = true;
+        run.onStep?.("read");
+      }
+      run.onReasoning?.(String(event.delta ?? ""));
+    } else if (event.type === "response.output_text.delta") {
+      if (!reachedSynthesize) {
+        reachedSynthesize = true;
+        run.onStep?.("synthesize");
+      }
+      const chunk = String(event.delta ?? "");
+      report += chunk;
+      run.onDelta?.(chunk);
+    } else if (event.type === "response.output_text.annotation.added") {
+      const citation = event.annotation;
+      const url = String(citation?.url ?? "");
+      if (citation?.type === "url_citation" && url) {
+        sources.set(url, {
+          title: String(citation.title ?? url),
+          url,
+          snippet: "",
+        });
+        run.onSources?.([...sources.values()]);
+      }
+    } else if (event.type === "response.failed" || event.type === "error") {
+      throw new Error(gatewayError(event.error ?? event.response?.error, "Deep Research failed."));
+    }
+  };
+
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
@@ -79,51 +125,12 @@ export async function runDeepResearchTool(run: DeepResearchToolRun): Promise<str
       const line = buffer.slice(0, newline).replace(/\r$/, "");
       buffer = buffer.slice(newline + 1);
       newline = buffer.indexOf("\n");
-      if (!line.startsWith("data:")) continue;
-      const raw = line.slice(5).trim();
-      if (!raw || raw === "[DONE]") continue;
-
-      let event: Record<string, any>;
-      try {
-        event = JSON.parse(raw);
-      } catch {
-        continue;
-      }
-
-      if (event.type === "response.web_search_call.searching") {
-        searches += 1;
-        run.onStep?.("search");
-        run.onStatus?.(`Searching and checking sources… (${searches})`);
-      } else if (event.type === "response.reasoning_summary_text.delta") {
-        if (!reachedRead) {
-          reachedRead = true;
-          run.onStep?.("read");
-        }
-        run.onReasoning?.(String(event.delta ?? ""));
-      } else if (event.type === "response.output_text.delta") {
-        if (!reachedSynthesize) {
-          reachedSynthesize = true;
-          run.onStep?.("synthesize");
-        }
-        const chunk = String(event.delta ?? "");
-        report += chunk;
-        run.onDelta?.(chunk);
-      } else if (event.type === "response.output_text.annotation.added") {
-        const citation = event.annotation;
-        const url = String(citation?.url ?? "");
-        if (citation?.type === "url_citation" && url) {
-          sources.set(url, {
-            title: String(citation.title ?? url),
-            url,
-            snippet: "",
-          });
-          run.onSources?.([...sources.values()]);
-        }
-      } else if (event.type === "response.failed" || event.type === "error") {
-        throw new Error(gatewayError(event.error ?? event.response?.error, "Deep Research failed."));
-      }
+      consumeLine(line);
     }
   }
+
+  const finalLine = buffer.trim();
+  if (finalLine) consumeLine(finalLine);
 
   if (!report.trim()) {
     throw new Error("Deep Research completed without a report. Please try again.");

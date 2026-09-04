@@ -50,6 +50,9 @@ export default function AgentTools({
 
   useEffect(() => {
     void load();
+    const refresh = () => void load();
+    window.addEventListener("megsy:integrations-changed", refresh);
+    return () => window.removeEventListener("megsy:integrations-changed", refresh);
   }, [load]);
 
   const toggle = async (app: ConnectedToolApp) => {
