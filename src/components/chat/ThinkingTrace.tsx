@@ -186,22 +186,40 @@ const ThinkingTrace = ({
       </button>
 
       {open && (
-        <div className="mt-2 max-h-80 overflow-y-auto">
-          <div className="flex flex-col gap-2.5 border-s border-border/40 ps-3">
-            {hasBody ? (
-              lines.map((line, i) => (
-                <div
-                  key={`${i}-${line.slice(0, 24)}`}
-                  className="flex items-start gap-2 text-[12.5px] leading-relaxed text-muted-foreground"
-                >
-                  <span
-                    aria-hidden
-                    className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full bg-border"
-                  />
-                  <span className="min-w-0 whitespace-pre-wrap break-words">{line}</span>
-                </div>
-              ))
-            ) : (
+        <div className="mt-2 max-h-80 overflow-y-auto rounded-xl bg-muted/30 p-3">
+          <div className="flex flex-col gap-3">
+            {stepLines.length > 0 && (
+              <ol className="flex flex-col gap-2">
+                {stepLines.map((line, i) => (
+                  <li
+                    key={`s-${i}-${line.slice(0, 24)}`}
+                    className="flex items-start gap-2.5 text-[12.5px] leading-relaxed text-muted-foreground"
+                  >
+                    <span
+                      aria-hidden
+                      className="mt-[3px] grid h-4 w-4 shrink-0 place-items-center rounded-full bg-border/60 text-[9px] font-semibold text-foreground/70"
+                    >
+                      {i + 1}
+                    </span>
+                    <span className="min-w-0 break-words">{line}</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+            {reasoningLines.length > 0 && (
+              <div className="flex flex-col gap-1.5 border-t border-border/40 pt-2.5">
+                {reasoningLines.map((line, i) => (
+                  <p
+                    key={`r-${i}-${line.slice(0, 24)}`}
+                    className="text-[12.5px] leading-relaxed text-muted-foreground/90 break-words"
+                  >
+                    {line}
+                  </p>
+                ))}
+              </div>
+            )}
+            {!hasBody && (
+
               <div className="text-[12.5px] text-muted-foreground">
                 {isAr ? "لا توجد تفاصيل بعد…" : "No details yet…"}
               </div>
