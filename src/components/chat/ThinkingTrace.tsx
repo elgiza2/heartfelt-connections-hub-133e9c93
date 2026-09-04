@@ -153,7 +153,7 @@ const ThinkingTrace = ({
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="flex w-full items-center gap-2 py-0.5 text-start"
+        className="flex w-full items-center gap-2 py-0.5 text-start shadow-none"
       >
         {active ? (
           tool ? (
@@ -178,7 +178,7 @@ const ThinkingTrace = ({
         >
           {headline}
         </span>
-        <span className="ms-auto grid h-6 w-6 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground">
+        <span className="ms-auto grid h-6 w-6 shrink-0 place-items-center text-muted-foreground transition-colors hover:text-foreground">
           <ChevronDown
             className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`}
           />
@@ -186,7 +186,7 @@ const ThinkingTrace = ({
       </button>
 
       {open && (
-        <div className="mt-2 max-h-80 overflow-y-auto rounded-xl bg-muted/30 p-3">
+        <div className="mt-2 max-h-80 overflow-y-auto border-s border-border ps-4 py-1">
           <div className="flex flex-col gap-3">
             {stepLines.length > 0 && (
               <ol className="flex flex-col gap-2">
@@ -195,12 +195,7 @@ const ThinkingTrace = ({
                     key={`s-${i}-${line.slice(0, 24)}`}
                     className="flex items-start gap-2.5 text-[12.5px] leading-relaxed text-muted-foreground"
                   >
-                    <span
-                      aria-hidden
-                      className="mt-[3px] grid h-4 w-4 shrink-0 place-items-center rounded-full bg-border/60 text-[9px] font-semibold text-foreground/70"
-                    >
-                      {i + 1}
-                    </span>
+                    <span aria-hidden className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground/50" />
                     <span className="min-w-0 break-words">{line}</span>
                   </li>
                 ))}

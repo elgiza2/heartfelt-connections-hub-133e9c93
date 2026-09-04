@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { m as motion, AnimatePresence } from "framer-motion";
-import { Download, Eye, ArrowLeft, Loader2, Share2 } from "lucide-react";
+import { Download, ArrowLeft, Loader2, Share2, RefreshCw } from "lucide-react";
 import MegsyStar from "@/components/files/MegsyStar";
 import { supabase } from "@/integrations/supabase/client";
 import { useFullscreenBodyClass } from "@/hooks/useFullscreenBodyClass";
@@ -72,20 +72,24 @@ const ImageSlidesCard = ({ title, url, slideCount, chatName }: Props) => {
   useFullscreenBodyClass(open);
 
   const [preview, setPreview] = useState<string | null>(null);
+  const [previewError, setPreviewError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
+    setPreviewError(false);
     renderPdfPageToDataUrl(url, 1, 1.0)
       .then((dataUrl) => {
         if (!cancelled) setPreview(dataUrl);
       })
       .catch((e) => {
         console.warn("[ImageSlidesCard] preview failed:", e);
+        if (!cancelled) setPreviewError(true);
       });
     return () => {
       cancelled = true;
     };
-  }, [url]);
+  }, [url, retryKey]);
 
   return (
     <>
@@ -107,14 +111,25 @@ const ImageSlidesCard = ({ title, url, slideCount, chatName }: Props) => {
               loading="lazy"
             />
           )}
-          {!preview && (
+          {!preview && !previewError && (
             <div className="absolute inset-0 flex items-center justify-center text-foreground/70">
               <Loader2 className="w-6 h-6 animate-spin" />
             </div>
           )}
+          {previewError && (
+            <span className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-muted text-muted-foreground">
+              <RefreshCw className="h-5 w-5" />
+              <span className="text-xs">Preview unavailable</span>
+            </span>
+          )}
         </button>
 
         <div className="slides-card-actions px-4 pb-4 pt-4 flex gap-2">
+          {previewError && (
+            <button onClick={() => setRetryKey((key) => key + 1)} className="slides-card-button slides-card-button--secondary px-3" aria-label="Retry preview">
+              <RefreshCw className="h-4 w-4" />
+            </button>
+          )}
           <button
             onClick={() => setOpen(true)}
             className="slides-card-button slides-card-button--accent flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium"

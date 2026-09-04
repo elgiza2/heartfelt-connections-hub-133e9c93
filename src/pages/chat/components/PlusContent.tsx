@@ -258,7 +258,7 @@ const PlusMain = (p: PlusContentProps) => {
   return (
     <motion.div key="main" {...fadeProps(-8)} className="flex flex-col">
       {/* MOBILE — bottom sheet */}
-      <div className="md:hidden flex flex-col pb-1.5" style={{ fontFamily: mobileFont }}>
+      <div className="md:hidden flex flex-col gap-1 pb-1.5" style={{ fontFamily: mobileFont }}>
         <style>{`
           .kimi-tile { transition: transform 160ms ease, opacity 160ms ease; }
           .kimi-tile:active { transform: scale(0.97); opacity: 0.75; }
@@ -266,18 +266,18 @@ const PlusMain = (p: PlusContentProps) => {
           .plus-row:active { background-color: hsl(var(--foreground) / 0.05); }
         `}</style>
 
-        {/* Media tiles strip */}
-        <div className="grid grid-cols-3 gap-2 px-2 pb-2">
+        <div className="px-2 pb-1 text-[11px] font-semibold uppercase text-muted-foreground">Add</div>
+        <div className="flex flex-col px-2 pb-2">
           {tiles.map((t) => (
             <button
               key={t.id}
               data-no-neo
               type="button"
               onClick={t.onClick}
-              className="kimi-tile flex h-[68px] flex-col items-center justify-center gap-1.5 rounded-[14px] border-0 bg-muted"
+              className="kimi-tile flex h-11 items-center gap-3 border-b border-border/60 px-2 text-start last:border-b-0"
             >
-              <t.Icon className="h-[19px] w-[19px] text-foreground/80" strokeWidth={1.7} />
-              <span className="text-[11.5px] font-medium leading-none text-foreground/70">
+              <span className="grid h-8 w-8 place-items-center rounded-lg bg-muted"><t.Icon className="h-4 w-4 text-foreground/80" strokeWidth={1.7} /></span>
+              <span className="text-[13px] font-medium leading-none text-foreground">
                 {t.label}
               </span>
             </button>

@@ -22,6 +22,7 @@ import { isSendKey } from "@/lib/composerKey";
 import { parseSlashCommand } from "@/lib/slashCommands";
 import { useNavigate, useLocation } from "react-router-dom";
 import { t as uiT, useUserLang } from "@/lib/authI18n";
+import { Button } from "@/components/ui/button";
 
 interface SmartQuestion {
   title: string;
@@ -431,19 +432,18 @@ const AnimatedInput = ({
             dir="ltr"
             className="relative flex items-center gap-1 pt-1 md:pt-0"
           >
-            <motion.button
+            <Button
               type="button"
               onClick={onPlusClick}
-              whileTap={{ scale: 0.96 }}
-              transition={{ duration: 0.14, ease: "easeOut" }}
-              className="animated-plus-btn shrink-0 inline-flex w-11 h-11 md:w-10 md:h-10 items-center justify-center rounded-full border-0 outline-none text-foreground/70 hover:text-foreground transition-colors"
-              style={{ boxShadow: "none", background: "transparent", border: 0 }}
+              variant="ghost"
+              size="icon-sm"
+              className="animated-plus-btn shrink-0 rounded-full text-muted-foreground hover:text-foreground"
               aria-label={uiT("openTools")}
               data-plus-trigger
             >
 
               <Plus className="w-[20px] h-[20px]" strokeWidth={1.9} />
-            </motion.button>
+            </Button>
 
 
             <ComposerIntegrationsButton onClick={() => setIntegrationsOpen(true)} />
@@ -464,35 +464,29 @@ const AnimatedInput = ({
 
             <AnimatePresence mode="popLayout" initial={false}>
               {isLoading ? (
-                <motion.button
+                <Button
                   key="stop"
-                  initial={{ opacity: 0, scale: 0.92 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.6 }}
-                  transition={{ duration: 0.14, ease: "easeOut" }}
-                  whileTap={{ scale: 0.96 }}
                   onClick={onCancel}
-                  className="shrink-0 w-11 h-11 md:h-10 md:w-10 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow-[0_2px_10px_rgba(0,0,0,0.2)] hover:opacity-90 transition-opacity"
+                  variant="destructive"
+                  size="icon-sm"
+                  className="shrink-0 rounded-full shadow-none"
                   aria-label={uiT("stopGeneration")}
                 >
                   <Square className="w-3 h-3" fill="currentColor" />
-                </motion.button>
+                </Button>
               ) : (
-                <motion.button
+                <Button
                   key="send"
-                  initial={{ opacity: 0, scale: 0.92 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.6 }}
-                  transition={{ duration: 0.14, ease: "easeOut" }}
-                  whileTap={{ scale: 0.96 }}
                   onClick={handleSendWithSlash}
                   disabled={disabled || (!value.trim() && !canSendWithoutText)}
                   data-testid="mobile-composer-send"
-                  className="shrink-0 w-11 h-11 md:h-10 md:w-10 flex items-center justify-center rounded-full bg-foreground text-background shadow-[0_2px_10px_rgba(0,0,0,0.2)] hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                  variant="neutral"
+                  size="icon-sm"
+                  className="shrink-0 rounded-full shadow-none disabled:opacity-40"
                   aria-label={uiT("sendMessage")}
                 >
                   <ArrowUp className="w-[18px] h-[18px] md:w-4 md:h-4" strokeWidth={2.2} />
-                </motion.button>
+                </Button>
 
               )}
             </AnimatePresence>
