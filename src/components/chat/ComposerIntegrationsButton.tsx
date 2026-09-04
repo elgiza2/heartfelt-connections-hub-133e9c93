@@ -29,8 +29,7 @@ export function ComposerIntegrationsButton({ onClick, label = "Integrations" }: 
     const warm = window.requestIdleCallback ?? ((cb: IdleRequestCallback) => window.setTimeout(cb, 300));
     const id = warm(() => prefetchIntegrationsSheet());
     return () => {
-      if ("cancelIdleCallback" in window) window.cancelIdleCallback(id);
-      else window.clearTimeout(id);
+      window.cancelIdleCallback?.(id);
     };
   }, []);
 

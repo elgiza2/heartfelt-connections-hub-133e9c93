@@ -7,7 +7,6 @@ import {
   SlidesDeckCard,
   StandardSlidesCard,
   ImageSlidesCard,
-  SlidesOutlineCard,
   DocsPlanCard,
   OperatorInlineBubbleLazy,
   DocsArtifactCard,
