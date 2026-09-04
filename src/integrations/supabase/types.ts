@@ -10645,6 +10645,17 @@ export type Database = {
           tier_name: string
         }[]
       }
+      check_api_rate_limit: {
+        Args: {
+          _endpoint: string
+          _request_limit: number
+          _window_seconds: number
+        }
+        Returns: {
+          allowed: boolean
+          retry_after: number
+        }[]
+      }
       check_edge_rate_limit: {
         Args: {
           _endpoint: string
