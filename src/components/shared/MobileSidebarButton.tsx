@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 interface MobileSidebarButtonProps {
   onClick: () => void;
@@ -23,14 +24,15 @@ export function MobileSidebarButton({
   edge = false,
 }: MobileSidebarButtonProps) {
   return (
-    <button
+    <Button
       type="button"
       onClick={onClick}
       aria-label={ariaLabel}
       data-testid={testId}
-      style={{ border: "none", outline: "none", boxShadow: "none" }}
+      variant="ghost"
+      size="icon-sm"
       className={cn(
-        "md:hidden w-11 h-11 rounded-2xl flex items-center justify-center text-foreground bg-transparent border-0 active:scale-95 transition",
+        "md:hidden rounded-lg text-foreground shadow-none",
         edge &&
           "fixed z-30 start-3 top-[max(env(safe-area-inset-top),0.25rem)]",
         className,
@@ -84,7 +86,7 @@ export function MobileSidebarButton({
           strokeLinecap="round"
         />
       </svg>
-    </button>
+    </Button>
   );
 }
 

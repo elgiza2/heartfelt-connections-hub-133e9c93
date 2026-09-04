@@ -1,5 +1,7 @@
 import { Blocks } from "lucide-react";
+import { useEffect } from "react";
 import { useConnectedApps } from "@/hooks/useConnectedApps";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   onClick: () => void;
@@ -23,14 +25,23 @@ export function ComposerIntegrationsButton({ onClick, label = "Integrations" }: 
   const shown = apps.slice(0, 3);
   const extra = apps.length - shown.length;
 
+  useEffect(() => {
+    const warm = window.requestIdleCallback ?? ((cb: IdleRequestCallback) => window.setTimeout(cb, 300));
+    const id = warm(() => prefetchIntegrationsSheet());
+    return () => {
+      window.cancelIdleCallback?.(id);
+    };
+  }, []);
+
   return (
-    <button
+    <Button
       type="button"
       onClick={onClick}
       onPointerDown={prefetchIntegrationsSheet}
       aria-label={label}
-      className="shrink-0 inline-flex h-11 w-11 md:h-10 md:w-10 items-center justify-center rounded-full border-0 bg-transparent outline-none transition-opacity hover:opacity-80"
-      style={{ background: "transparent", border: 0, boxShadow: "none" }}
+      variant="ghost"
+      size="icon-sm"
+      className="shrink-0 rounded-full text-muted-foreground hover:text-foreground"
     >
       {shown.length === 0 ? (
         <Blocks className="w-[20px] h-[20px] text-foreground/70" strokeWidth={1.9} />
@@ -63,7 +74,7 @@ export function ComposerIntegrationsButton({ onClick, label = "Integrations" }: 
           )}
         </span>
       )}
-    </button>
+    </Button>
   );
 }
 

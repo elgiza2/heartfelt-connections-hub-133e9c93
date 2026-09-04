@@ -20,6 +20,8 @@ const IMAGE_NOUN_AR = /(?:صورة|صوره|صور|بوستر|بوسترات|ل�
 const VIDEO_NOUN_AR = /(?:فيديو|فيديوهات|مقطع\s*فيديو|كليب|ريلز|ريل)/;
 
 const IMAGE_EN = /\b(?:generate|create|make|draw|design|render|paint|produce)\b[^.\n]{0,40}\b(?:image|picture|photo|poster|logo|illustration|wallpaper|icon|artwork)\b/i;
+const IMAGE_REQUEST_EN = /\b(?:show|give|send)\s+(?:me\s+)?(?:an?\s+|the\s+)?(?:image|picture|photo|poster|logo|illustration|wallpaper|icon|artwork)\b/i;
+const IMAGE_REQUEST_AR = /(?:وريني|أرني|ارني|هات(?:لي)?|جيب(?:لي)?)\s*(?:صورة|صوره|صور|بوستر|لوجو|شعار|خلفية|رسمة|رسمه|تصميم)/i;
 const VIDEO_EN = /\b(?:generate|create|make|render|produce|animate)\b[^.\n]{0,40}\b(?:video|clip|animation|reel)\b/i;
 
 /** Regex-only detection — runs before every send, so it must not do network I/O. */
@@ -30,7 +32,7 @@ export function detectMediaIntent(text: string): MediaIntent {
 
   const hasVerb = VERB_AR.test(raw);
   if ((hasVerb && VIDEO_NOUN_AR.test(raw)) || VIDEO_EN.test(raw)) return "video";
-  if ((hasVerb && IMAGE_NOUN_AR.test(raw)) || IMAGE_EN.test(raw)) return "image";
+  if ((hasVerb && IMAGE_NOUN_AR.test(raw)) || IMAGE_EN.test(raw) || IMAGE_REQUEST_EN.test(raw) || IMAGE_REQUEST_AR.test(raw)) return "image";
   return null;
 }
 

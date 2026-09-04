@@ -328,7 +328,7 @@ const PricingPage = () => {
       // global → Dodo Payments, local/wallets → Kashier.
       const provider =
         gateway === "global" ? "dodo" : "kashier";
-      const method = gateway === "wallets" ? "vodafone_cash" : "card";
+      const method = gateway === "wallets" ? "wallet" : "card";
 
       // Kashier: server-side catalog decides amount/credits/plan. We only
       // pass a sku that matches public.billing_skus.

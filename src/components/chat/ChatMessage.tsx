@@ -32,7 +32,6 @@ import { visit, SKIP } from "unist-util-visit";
 import { toString } from "mdast-util-to-string";
 import { toast } from "sonner";
 import ThinkingLoader from "./ThinkingLoader";
-import SlidesGenerationProgress from "./SlidesGenerationProgress";
 import { type ParallelAgentTask } from "./ParallelAgentsPanel";
 import { detectLang, langDir } from "@/lib/detectLang";
 import { parseLearnSegments, hasLearnCards } from "@/lib/learnCardParser";
@@ -84,6 +83,7 @@ import {
   ChainOfThoughtItem,
 } from "@/components/prompt-kit/chain-of-thought";
 import { Message, MessageContent } from "@/components/prompt-kit/message";
+import { MessageActions as AIMessageActions, MessageAction as AIMessageAction } from "@/components/ai-elements/message";
 import ThinkingTrace from "./ThinkingTrace";
 import { estimateTokens, formatTokens } from "@/pages/chat/utils/estimateTokens";
 import { SecureVideo } from "@/components/chat/media/SecureVideo";
@@ -1498,19 +1498,15 @@ const ChatMessage = ({
           />
         )}
         {showLiveThinkingTrace && (
-          isSlidesMode ? (
-            <SlidesGenerationProgress status={searchStatus} className={content ? "mb-2" : ""} />
-          ) : (
-            <ThinkingTrace
-              status={searchStatus}
-              steps={[...(narrations || []), ...(activeThinkingSteps || [])]}
-              text={reasoning}
-              active
-              tool={activeToolName}
-              running={hasRunningTool || toolActivity?.status === "running"}
-              className={content ? "mb-2" : ""}
-            />
-          )
+          <ThinkingTrace
+            status={searchStatus}
+            steps={[...(narrations || []), ...(activeThinkingSteps || [])]}
+            text={reasoning}
+            active
+            tool={isSlidesMode ? "slides" : activeToolName}
+            running={hasRunningTool || toolActivity?.status === "running" || isSlidesMode}
+            className={content ? "mb-2" : ""}
+          />
         )}
         {role === "assistant" &&
           reasoning &&
@@ -1960,46 +1956,43 @@ const ChatMessage = ({
 
             {/* Action buttons: like + copy + dislike only — quiet, no shadows, no springy motion */}
             {!isStreaming && !hasRunningTool && content && !showSlidesInfoBox && !hideActions && (
-              <div className="flex items-center gap-0.5 mt-1.5">
-                <button
-                  type="button"
+              <AIMessageActions className="mt-1.5 gap-0">
+                <AIMessageAction
                   onClick={() => handleLikeAction(liked === true ? null : true)}
-                  className={`inline-flex h-7 w-7 items-center justify-center rounded-lg transition-colors duration-150 ${
+                  tooltip="Like"
+                  className={`h-7 w-7 rounded-md bg-transparent shadow-none ${
                     liked === true
                       ? "text-primary"
-                      : "text-muted-foreground/70 hover:text-foreground hover:bg-foreground/5"
+                      : "text-muted-foreground/70 hover:text-foreground"
                   }`}
-                  title="Like"
                 >
                   <ThumbsUp className="w-[15px] h-[15px]" strokeWidth={1.75} />
-                </button>
+                </AIMessageAction>
 
-                <button
-                  type="button"
+                <AIMessageAction
                   onClick={handleCopy}
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground/70 hover:text-foreground hover:bg-foreground/5 transition-colors duration-150"
-                  title={copied ? "Copied" : "Copy"}
+                  tooltip={copied ? "Copied" : "Copy"}
+                  className="h-7 w-7 rounded-md bg-transparent text-muted-foreground/70 shadow-none hover:text-foreground"
                 >
                   {copied ? (
                     <Check className="w-[15px] h-[15px] text-emerald-500" strokeWidth={1.75} />
                   ) : (
                     <Copy className="w-[15px] h-[15px]" strokeWidth={1.75} />
                   )}
-                </button>
+                </AIMessageAction>
 
-                <button
-                  type="button"
+                <AIMessageAction
                   onClick={() => handleLikeAction(liked === false ? null : false)}
-                  className={`inline-flex h-7 w-7 items-center justify-center rounded-lg transition-colors duration-150 ${
+                  tooltip="Dislike"
+                  className={`h-7 w-7 rounded-md bg-transparent shadow-none ${
                     liked === false
                       ? "text-destructive"
-                      : "text-muted-foreground/70 hover:text-foreground hover:bg-foreground/5"
+                      : "text-muted-foreground/70 hover:text-foreground"
                   }`}
-                  title="Dislike"
                 >
                   <ThumbsDown className="w-[15px] h-[15px]" strokeWidth={1.75} />
-                </button>
-              </div>
+                </AIMessageAction>
+              </AIMessageActions>
             )}
 
             {!isStreaming && !hasRunningTool && content && (

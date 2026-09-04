@@ -2845,7 +2845,6 @@ const ChatPage = () => {
 
   return (
     <AuiProvider
-      key={conversationId ?? "new"}
       messages={messages}
       isRunning={isLoading || isThinking}
       onNew={(text) => handleSendWithText(text)}

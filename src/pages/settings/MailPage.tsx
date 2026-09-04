@@ -30,6 +30,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { isPinned, setPinned } from "@/lib/sidebarPins";
 import DesktopSettingsLayout from "@/components/settings/DesktopSettingsLayout";
 import MobilePushShell from "@/components/layout/MobilePushShell";
+import MobileSidebarButton from "@/components/shared/MobileSidebarButton";
 import { useSidebarCollapsed } from "@/hooks/useSidebarCollapsed";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -593,14 +594,11 @@ export default function MailPage() {
             className="flex items-center gap-2 px-3 pb-1"
             style={{ paddingTop: "max(env(safe-area-inset-top), 12px)" }}
           >
-            <button
-              type="button"
+            <MobileSidebarButton
               onClick={() => setSidebarOpen(true)}
-              aria-label={tx("Open menu")}
-              className="flex h-11 w-11 items-center justify-center rounded-full text-foreground transition active:scale-95"
-            >
-              <PanelLeft className="h-[20px] w-[20px] rtl:rotate-180" />
-            </button>
+              ariaLabel={tx("Open menu")}
+              className="relative shrink-0"
+            />
             <h1 className="min-w-0 flex-1 truncate text-[19px] font-semibold tracking-tight">{tx("Mail")}</h1>
           </div>
           <div className="px-4 pb-24">{Body}</div>

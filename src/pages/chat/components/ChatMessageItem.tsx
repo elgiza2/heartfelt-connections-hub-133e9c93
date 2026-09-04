@@ -7,7 +7,6 @@ import {
   SlidesDeckCard,
   StandardSlidesCard,
   ImageSlidesCard,
-  SlidesOutlineCard,
   DocsPlanCard,
   OperatorInlineBubbleLazy,
   DocsArtifactCard,
@@ -337,20 +336,6 @@ const ChatMessageItemImpl = ({
           <MediaGenerationSkeleton
             kind={msg.mode === "video" ? "video" : "images"}
           />
-        </div>
-      )}
-      {msg.role === "assistant" && (msg.slidesOutline || msg.slidesPlan) && (
-        <div className="px-3 md:px-12">
-          <Suspense fallback={null}>
-            <SlidesOutlineCard
-              outline={msg.slidesPlan?.outline || msg.slidesOutline!}
-              plan={msg.slidesPlan}
-              messageId={msg.id}
-              conversationId={conversationId}
-              userId={chatUserId}
-              status={msg.slidesDeck || msg.standardSlides || msg.imageSlides ? "done" : msg.slidesJobId ? "generating" : "planning"}
-            />
-          </Suspense>
         </div>
       )}
       {msg.role === "assistant" && msg.slidesDeck && (

@@ -637,7 +637,11 @@ const SlidesDeckCard = ({ deck, hideCard = false, autoOpen = false, onClose }: P
   };
 
   // Card preview — real slide-1 thumbnail rendered from the deck itself.
-  const cover = deck.slides[0];
+  const cover = deck.slides[0] ?? {
+    type: "cover",
+    title: deck.title || "Presentation",
+    subtitle: deck.subtitle || "",
+  };
   return (
     <>
       {!hideCard && (
@@ -649,15 +653,11 @@ const SlidesDeckCard = ({ deck, hideCard = false, autoOpen = false, onClose }: P
           }}
           className="slides-card-preview relative block w-full aspect-[16/9] overflow-hidden cursor-pointer"
         >
-          {cover ? (
-            <div className="absolute inset-0 pointer-events-none">
-              <ScaledSlide>
-                <SlideRender slide={cover} palette={deck.palette} dir={dir} />
-              </ScaledSlide>
-            </div>
-          ) : (
-            <div className="absolute inset-0" style={{ background: deck.palette.bg }} />
-          )}
+          <div className="absolute inset-0 pointer-events-none">
+            <ScaledSlide>
+              <SlideRender slide={cover} palette={deck.palette} dir={dir} />
+            </ScaledSlide>
+          </div>
           <div className="absolute top-2.5 end-2.5 inline-flex items-center gap-1 rounded-full bg-background/70 backdrop-blur px-2.5 py-1 text-[11px] font-medium text-foreground opacity-0 group-hover:opacity-100 transition">
             <Maximize2 className="w-3 h-3" /> Open
           </div>

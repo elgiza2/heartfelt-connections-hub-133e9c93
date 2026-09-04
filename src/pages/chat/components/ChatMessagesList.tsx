@@ -73,7 +73,6 @@ export const ChatMessagesList = forwardRef<HTMLDivElement, ChatMessagesListProps
       <div
         data-no-translate="true"
         className="max-w-3xl mx-auto pt-20 pb-56 md:pb-64 px-4 md:px-6 space-y-2"
-        style={editingIndex !== null ? { visibility: "hidden" } : undefined}
       >
         {chatMode === "learning" && (
           <Suspense fallback={null}>
@@ -83,10 +82,12 @@ export const ChatMessagesList = forwardRef<HTMLDivElement, ChatMessagesListProps
         {(() => {
           return messages.map((msg, i) => {
             if (msg.hiddenFromTranscript) return null;
+            if (editingIndex === i) return null;
+            const stableKey = msg.clientId || msg.id || msg.created_at || `${msg.role}-${String(msg.content || "").slice(0, 48)}-${i}`;
             return (
               <div
-                key={msg.clientId || msg.id || `idx-${i}`}
-                data-msg-anchor={msg.clientId || msg.id || `idx-${i}`}
+                key={stableKey}
+                data-msg-anchor={stableKey}
                 style={{
                   contentVisibility: "auto",
                   containIntrinsicSize: "auto 120px",
