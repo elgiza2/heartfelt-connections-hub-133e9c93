@@ -138,26 +138,35 @@ export function parseVariant(layoutOrVariant: string | undefined) {
 /* ============================================================
  * ScaledSlide — fixed 1920x1080 canvas, scales to fit parent.
  * ============================================================ */
-function ScaledSlide({ children }: { children: React.ReactNode }) {
+function ScaledSlide({ children, portrait = false }: { children: React.ReactNode; portrait?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
+  const canvasW = portrait ? 1080 : 1920;
+  const canvasH = portrait ? 1920 : 1080;
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
     const compute = () => {
       const r = el.getBoundingClientRect();
       if (r.width === 0 || r.height === 0) return;
-      const s = Math.min(r.width / 1920, r.height / 1080);
+      const s = Math.min(r.width / canvasW, r.height / canvasH);
       setScale(s);
     };
     compute();
     const ro = new ResizeObserver(compute);
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [canvasW, canvasH]);
   return (
     <div ref={ref} className="slide-stage">
-      <div className="slide-canvas" style={{ ["--slide-scale" as never]: scale }}>
+      <div
+        className="slide-canvas"
+        style={{
+          ["--slide-scale" as never]: scale,
+          width: canvasW,
+          height: canvasH,
+        }}
+      >
         {children}
       </div>
     </div>
@@ -172,10 +181,12 @@ function SlideRender({
   slide,
   palette,
   dir,
+  portrait = false,
 }: {
   slide: SlideData;
   palette: SlideDeck["palette"];
   dir: "ltr" | "rtl";
+  portrait?: boolean;
 }) {
   const rawLayout = (slide.layout || slide.variant || "").toLowerCase();
   const {
@@ -247,6 +258,8 @@ function SlideRender({
         background: safePalette.bg,
         color: safePalette.fg,
         direction: dir,
+        width: portrait ? 1080 : 1920,
+        height: portrait ? 1920 : 1080,
         ["--slide-accent-color" as never]: accentColor,
       }}
     >
