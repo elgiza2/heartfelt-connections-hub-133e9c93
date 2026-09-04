@@ -39,7 +39,7 @@ const chipClass =
   "group flex items-center gap-2 rounded-2xl border border-border/50 bg-card " +
   "px-4 h-9 shadow-[0_2px_6px_hsl(var(--foreground)/0.06)] " +
   "hover:shadow-[0_6px_16px_hsl(var(--foreground)/0.10)] hover:border-border " +
-  "transition-all duration-200 active:scale-[0.97]";
+  "transition-all duration-200";
 
 const iconClass =
   "w-4 h-4 text-muted-foreground shrink-0 transition-colors group-hover:text-foreground";

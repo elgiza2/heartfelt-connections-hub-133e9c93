@@ -328,7 +328,7 @@ const AnimatedInput = ({
                     <button
                       type="button"
                       onClick={onCancelEdit}
-                      className="inline-flex items-center justify-center w-6 h-6 rounded-full text-foreground/60 hover:text-foreground hover:bg-foreground/10 active:scale-90 transition"
+                      className="inline-flex items-center justify-center w-6 h-6 rounded-full text-foreground/60 hover:text-foreground hover:bg-foreground/10 transition"
                       aria-label={uiT("cancelEdit")}
                     >
                       <X className="w-3.5 h-3.5" strokeWidth={2.4} />

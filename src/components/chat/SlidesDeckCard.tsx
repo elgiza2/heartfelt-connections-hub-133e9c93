@@ -645,7 +645,7 @@ const SlidesDeckCard = ({ deck, hideCard = false, autoOpen = false, onClose }: P
             }}
               data-slides-preview-button
             style={{ backgroundColor: "#ffffff", color: "#000000" }}
-            className="w-full flex items-center justify-center gap-2 py-3.5 font-semibold rounded-2xl transition-all active:scale-[0.97] hover:brightness-95 shadow-lg text-[14px] tracking-tight"
+            className="w-full flex items-center justify-center gap-2 py-3.5 font-semibold rounded-2xl transition-all hover:brightness-95 shadow-lg text-[14px] tracking-tight"
           >
             <Maximize2 className="w-4 h-4" />
             Open in preview
@@ -655,7 +655,7 @@ const SlidesDeckCard = ({ deck, hideCard = false, autoOpen = false, onClose }: P
             <button
               onClick={handlePptx}
               disabled={exportingPptx}
-              className="flex-1 flex items-center justify-center gap-2 py-3 bg-zinc-900 text-zinc-400 hover:text-foreground font-medium rounded-2xl border border-foreground/5 transition-all hover:bg-zinc-800 active:scale-[0.97] disabled:opacity-50 text-[13px]"
+              className="flex-1 flex items-center justify-center gap-2 py-3 bg-zinc-900 text-zinc-400 hover:text-foreground font-medium rounded-2xl border border-foreground/5 transition-all hover:bg-zinc-800 disabled:opacity-50 text-[13px]"
             >
               {exportingPptx ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -668,7 +668,7 @@ const SlidesDeckCard = ({ deck, hideCard = false, autoOpen = false, onClose }: P
               onClick={handleHtml}
               disabled={exportingHtml}
               aria-label="HTML"
-              className="w-11 h-11 flex items-center justify-center bg-zinc-900 text-zinc-400 hover:text-foreground rounded-2xl border border-foreground/5 transition-all hover:bg-zinc-800 active:scale-[0.97] disabled:opacity-50"
+              className="w-11 h-11 flex items-center justify-center bg-zinc-900 text-zinc-400 hover:text-foreground rounded-2xl border border-foreground/5 transition-all hover:bg-zinc-800 disabled:opacity-50"
             >
               {exportingHtml ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />

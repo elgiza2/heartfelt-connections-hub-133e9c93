@@ -108,7 +108,7 @@ export default function MobileModeBar({ mode, onChange }: Props) {
                 haptic("soft");
                 onChange("normal");
               }}
-              className="inline-flex items-center justify-center w-7 h-7 rounded-full transition-transform active:scale-90"
+              className="inline-flex items-center justify-center w-7 h-7 rounded-full transition-transform"
               style={{
                 backgroundColor: "hsl(var(--brand-ink) / 0.18)",
                 color: "hsl(var(--brand-ink))",
@@ -138,7 +138,7 @@ export default function MobileModeBar({ mode, onChange }: Props) {
                 scrollSnapAlign: "start",
                 fontWeight: 600,
               }}
-              className="shrink-0 inline-flex items-center gap-1.5 h-10 px-3.5 rounded-full border border-border/60 bg-card text-[13px] text-foreground/85 shadow-[0_2px_8px_hsl(var(--foreground)/0.07)] transition-all active:scale-95"
+              className="shrink-0 inline-flex items-center gap-1.5 h-10 px-3.5 rounded-full border border-border/60 bg-card text-[13px] text-foreground/85 shadow-[0_2px_8px_hsl(var(--foreground)/0.07)] transition-all"
             >
               <Icon size={14} strokeWidth={2.4} style={{ color }} />
               <span className="leading-none whitespace-nowrap">{tx(label)}</span>

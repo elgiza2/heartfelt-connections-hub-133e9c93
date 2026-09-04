@@ -137,7 +137,7 @@ export default function MediaModelPickerSheet({
                     });
                     toast.success(`Selected: ${m.name}`);
                   }}
-                  className={glassModelMenu.card(active, "text-start rounded-[20px] active:scale-[0.98] relative")}
+                  className={glassModelMenu.card(active, "text-start rounded-[20px] relative")}
                 >
                   {locked && (
                     <span className="absolute top-2 right-2 z-10 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold uppercase bg-amber-400/25 text-amber-500 border border-amber-400/30">

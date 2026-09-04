@@ -83,7 +83,7 @@ export default function ImageToolsBar({ onAttach, onUseCharacter }: Props) {
   };
 
   const btn =
-    "inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-[12.5px] font-medium text-foreground/85 hover:text-foreground bg-foreground/[0.07] hover:bg-foreground/[0.12] border border-foreground/10 transition active:scale-[0.97] disabled:opacity-50";
+    "inline-flex items-center gap-1.5 h-8 px-3 rounded-full text-[12.5px] font-medium text-foreground/85 hover:text-foreground bg-foreground/[0.07] hover:bg-foreground/[0.12] border border-foreground/10 transition disabled:opacity-50";
 
   return (
     <div className="px-2 pt-2 pb-1 space-y-2" dir="auto">

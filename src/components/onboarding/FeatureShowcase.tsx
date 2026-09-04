@@ -1103,7 +1103,7 @@ export default function FeatureShowcase({ onFinish }: { onFinish?: () => void })
   const press = (e: import("react").MouseEvent<HTMLButtonElement>, run: () => void) => {
     const r = e.currentTarget.getBoundingClientRect();
     setRipple({ id: Date.now(), x: e.clientX - r.left, y: e.clientY - r.top });
-    navigator.vibrate?.(8);
+    
     run();
   };
 

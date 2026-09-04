@@ -64,7 +64,7 @@ function SelectRow({
       type="button"
       onClick={onClick}
       aria-label={ariaLabel}
-      className="flex-1 min-w-0 flex items-center gap-2 h-11 px-2.5 rounded-2xl border border-foreground/10 bg-foreground/[0.05] hover:bg-foreground/[0.08] active:scale-[0.99] transition text-start"
+      className="flex-1 min-w-0 flex items-center gap-2 h-11 px-2.5 rounded-2xl border border-foreground/10 bg-foreground/[0.05] hover:bg-foreground/[0.08] transition text-start"
     >
       <span className="w-7 h-7 rounded-lg overflow-hidden shrink-0 flex items-center justify-center bg-foreground/[0.06]">
         {icon}

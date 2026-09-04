@@ -239,7 +239,7 @@ export default function MobileChatHeader({
             onClick={onOpenSidebar}
             aria-label="Open menu"
             data-testid="mobile-open-sidebar"
-            className="w-11 h-11 rounded-full flex items-center justify-center text-foreground active:scale-95 transition bg-transparent border-0"
+            className="w-11 h-11 rounded-full flex items-center justify-center text-foreground transition bg-transparent border-0"
           >
             <MegsySidebarToggleIcon />
         </button>
@@ -265,7 +265,7 @@ export default function MobileChatHeader({
           <button
             type="button"
             onClick={() => navigate("/auth")}
-            className="btn-sunset h-9 px-4 rounded-2xl text-[13px] font-bold active:scale-95 transition mb-0.5"
+            className="btn-sunset h-9 px-4 rounded-2xl text-[13px] font-bold transition mb-0.5"
           >
             {uiT("Sign in", lang)}
           </button>

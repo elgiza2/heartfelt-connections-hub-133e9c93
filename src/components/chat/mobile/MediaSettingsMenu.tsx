@@ -82,7 +82,7 @@ export default function MediaSettingsMenu({ mode, open, onOpenChange, onChange }
         <button
           type="button"
           aria-label={translateExactText("Generation settings", lang)}
-          className="inline-flex h-9 items-center gap-2 rounded-full pl-1 pr-3 text-[12.5px] font-semibold text-foreground border border-foreground/15 active:scale-95 transition"
+          className="inline-flex h-9 items-center gap-2 rounded-full pl-1 pr-3 text-[12.5px] font-semibold text-foreground border border-foreground/15 transition"
           style={{
             background: "hsl(var(--foreground) / 0.09)",
             backdropFilter: "blur(18px) saturate(170%)",
@@ -221,7 +221,7 @@ export function MediaSettingsPanel({
                 key={r.id}
                 type="button"
                 onClick={() => update({ aspectRatio: r.id })}
-                className={`flex flex-col items-center justify-center gap-1 h-[58px] rounded-2xl border transition-all active:scale-95 ${
+                className={`flex flex-col items-center justify-center gap-1 h-[58px] rounded-2xl border transition-all ${
                   active
                     ? "border-foreground/25 text-foreground"
                     : "border-foreground/10 text-foreground/60"
@@ -404,7 +404,7 @@ function Segmented({
             key={it.id}
             type="button"
             onClick={() => onChange(it.id)}
-            className={`flex-1 h-8 inline-flex items-center justify-center rounded-lg text-[12px] font-semibold transition-all active:scale-95 ${
+            className={`flex-1 h-8 inline-flex items-center justify-center rounded-lg text-[12px] font-semibold transition-all ${
               active
                 ? "text-foreground border border-foreground/20"
                 : "text-foreground/55 hover:text-foreground/85"
@@ -439,7 +439,7 @@ function Chip({
     <button
       type="button"
       onClick={onClick}
-      className={`h-10 inline-flex items-center justify-center rounded-xl text-[12.5px] font-semibold border transition-all active:scale-95 ${
+      className={`h-10 inline-flex items-center justify-center rounded-xl text-[12.5px] font-semibold border transition-all ${
         active
           ? "bg-foreground text-background border-foreground shadow-[0_6px_20px_-6px_var(--overlay-black-35)]"
           : "bg-foreground/[0.03] text-foreground/80 border-foreground/[0.08] hover:bg-foreground/[0.07] hover:border-foreground/[0.12]"
