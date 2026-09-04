@@ -103,6 +103,7 @@ export default function IntegrationsSheet({ open, onOpenChange }: Props) {
       if (connected[item.app]) {
         await disconnectIntegration(item);
         await refresh();
+        window.dispatchEvent(new CustomEvent("megsy:integrations-changed"));
         toast.success(`Disconnected ${item.name}`);
       } else {
         const res = await startIntegrationConnection(item);
@@ -114,6 +115,7 @@ export default function IntegrationsSheet({ open, onOpenChange }: Props) {
         } else {
           await refresh();
         }
+        window.dispatchEvent(new CustomEvent("megsy:integrations-changed"));
         toast.success(`Connected ${item.name}`);
       }
     } catch (e: any) {
