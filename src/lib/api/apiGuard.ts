@@ -110,12 +110,16 @@ export async function guardApiRequest(request: Request, endpoint: string): Promi
     });
     if (error || !Array.isArray(data) || !data[0]) {
       console.error("Persistent API rate limiter failed", error?.message ?? "invalid response");
-      return { ok: false, status: 503, error: "Request protection is temporarily unavailable" };
+      // The durable limiter is best-effort. A transient RPC/schema outage must
+      // not take chat, research and media down with it; retain protection with
+      // the same per-user in-memory window used for unauthenticated transports.
+      limited = localRateLimit(endpoint, auth.user.id || clientIp(request.headers));
+    } else {
+      limited = {
+        ok: data[0].allowed === true,
+        retryAfter: Number(data[0].retry_after ?? 0),
+      };
     }
-    limited = {
-      ok: data[0].allowed === true,
-      retryAfter: Number(data[0].retry_after ?? 0),
-    };
   } else {
     limited = localRateLimit(endpoint, auth.user.id || clientIp(request.headers));
   }

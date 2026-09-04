@@ -957,10 +957,6 @@ const ChatMessage = ({
       longPressFiredRef.current = false;
       longPressRef.current = setTimeout(() => {
         longPressFiredRef.current = true;
-        // Haptic-ish: brief vibrate if supported
-        try {
-          (navigator as any).vibrate?.(8);
-        } catch {}
         setMenuOpen(true);
       }, 350);
     },
@@ -1307,7 +1303,7 @@ const ChatMessage = ({
                 </div>
                 {/* Desktop hover actions: ellipsis menu button */}
                 <div
-                  className={`hidden md:flex absolute right-0 top-full mt-1.5 z-30 items-center gap-1 transition-opacity duration-150 ${desktopMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto"}`}
+                  className={`hidden md:flex absolute right-0 top-full z-30 items-center gap-1 pt-1 transition-opacity duration-150 ${desktopMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-60 pointer-events-auto group-hover:opacity-100"}`}
                 >
                   <Popover open={desktopMenuOpen} onOpenChange={setDesktopMenuOpen}>
                     <PopoverTrigger asChild>
@@ -1316,7 +1312,7 @@ const ChatMessage = ({
                           e.stopPropagation();
                           setDesktopMenuOpen((v) => !v);
                         }}
-                        className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-foreground/[0.08] text-foreground border border-foreground/15 hover:bg-foreground/[0.14] transition-colors"
+                        className="inline-flex items-center justify-center w-7 h-7 rounded-md bg-transparent text-muted-foreground border-0 shadow-none hover:bg-muted hover:text-foreground transition-colors"
                         title="More"
                         aria-label="More"
                       >

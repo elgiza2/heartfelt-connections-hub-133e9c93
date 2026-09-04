@@ -1,4 +1,5 @@
 import { m as motion } from "framer-motion";
+import { Check } from "lucide-react";
 import type { AgentModel } from "@/lib/agentRegistry";
 import { glassModelMenu, glassModelMenuStyle } from "./glassModelMenuStyles";
 
@@ -38,10 +39,10 @@ const ModelPickerDropdown = ({ models, query, onSelect, onClose }: ModelPickerDr
           <button
             key={model.id}
             onClick={() => onSelect(model)}
-            className={glassModelMenu.item(false, "justify-between mb-1 last:mb-0 active:scale-[0.98]")}
+            className={glassModelMenu.item(false, "justify-between mb-1 last:mb-0")}
           >
-            <span className="text-sm font-black text-foreground">{model.label}</span>
-            <span className="text-[11px] font-black text-brand-ink bg-brand-mint border border-brand-ink px-2 py-0.5 rounded-full">
+            <span className="min-w-0 truncate text-sm font-semibold text-foreground">{model.label}</span>
+            <span className="shrink-0 rounded-md bg-muted px-2 py-1 text-[11px] font-medium text-muted-foreground">
               {model.cost} MC
             </span>
           </button>
