@@ -6,7 +6,7 @@ import { useUserLang } from "@/lib/authI18n";
 const RTL_UI_LANGS = new Set(["ar", "ar-eg", "he", "fa"]);
 const CLOSE_SNAP = 0.64;
 const FLING_VELOCITY = 520;
-const PUSH_SPRING = { type: "spring" as const, stiffness: 240, damping: 34, mass: 1.05 };
+const PUSH_SPRING = { type: "spring" as const, stiffness: 420, damping: 42, mass: 0.8 };
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
@@ -46,13 +46,8 @@ export default function MobilePushShell({
   const progress = useTransform(shellX, (latest) =>
     revealX > 0 ? clamp(Math.abs(latest) / revealX, 0, 1) : 0,
   );
-  const shellScale = useTransform(progress, [0, 1], [1, 0.94]);
-  const shellRadius = useTransform(progress, [0, 1], [0, 32]);
-  const shellShadow = useTransform(progress, (p) =>
-    p > 0.02
-      ? `0 30px 90px -20px rgba(0,0,0,${0.36 + p * 0.34}), 0 0 0 1px rgba(255,255,255,${p * 0.06})`
-      : "0 0 0 rgba(0,0,0,0)",
-  );
+  const shellScale = useTransform(progress, [0, 1], [1, 0.985]);
+  const shellRadius = useTransform(progress, [0, 1], [0, 18]);
   const animationRef = useRef<{ stop: () => void } | null>(null);
   const animateShellTo = useCallback(
     (nextOpen: boolean) => {
@@ -134,7 +129,6 @@ export default function MobilePushShell({
           x: shellX,
           scale: shellScale,
           borderRadius: shellRadius,
-          boxShadow: shellShadow,
           transformOrigin: isRtlUi ? "right center" : "left center",
           touchAction: "pan-y",
         }}
@@ -160,7 +154,12 @@ export default function MobilePushShell({
               ? "pointer-events-auto"
               : "pointer-events-none"
           }`}
-          style={{ background: "rgba(0,0,0,0.42)", opacity: progress }}
+          className={`md:hidden absolute inset-0 z-[60] bg-foreground/20 ${
+            open
+              ? "pointer-events-auto"
+              : "pointer-events-none"
+          }`}
+          style={{ opacity: progress }}
           onClick={() => onOpenChange(false)}
           aria-hidden={!open}
         />
