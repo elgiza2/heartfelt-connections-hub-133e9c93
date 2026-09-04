@@ -822,6 +822,8 @@ const ChatMessage = ({
 
 }: ChatMessageProps) => {
   const [copied, setCopied] = useState(false);
+  const [burst, setBurst] = useState<"like" | "dislike" | null>(null);
+
   const [slidesInfoOpen, setSlidesInfoOpen] = useState(true);
   const [researchDraftOpen, setResearchDraftOpen] = useState(true);
   const [summaryOpen, setSummaryOpen] = useState(false);
