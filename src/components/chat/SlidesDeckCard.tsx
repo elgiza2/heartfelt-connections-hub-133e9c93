@@ -610,71 +610,64 @@ const SlidesDeckCard = ({ deck, hideCard = false, autoOpen = false, onClose }: P
     }
   };
 
-  // Card preview
+  // Card preview — real slide-1 thumbnail rendered from the deck itself.
   const cover = deck.slides[0];
   return (
     <>
       {!hideCard && (
-      <div className="mt-3 group relative max-w-[420px] rounded-ios-xl overflow-hidden bg-zinc-950 border border-foreground/5 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] transition-all duration-700 hover:border-foreground/10">
+      <div className="slides-card-shell mt-3 group relative max-w-[420px] transition-all duration-300 hover:border-border/80">
         <button
           onClick={() => {
             setIdx(0);
             openPreview();
           }}
-          className="relative block w-full aspect-[16/9] overflow-hidden bg-zinc-900"
-          style={{ background: deck.palette.bg }}
+          className="slides-card-preview relative block w-full aspect-[16/9] overflow-hidden cursor-pointer"
         >
-          {cover?.image && (
-            <img loading="lazy" decoding="async"
-              src={cover.image}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover opacity-60 scale-110 group-hover:scale-100 transition-transform duration-1000"
-            />
+          {cover ? (
+            <div className="absolute inset-0 pointer-events-none">
+              <ScaledSlide>
+                <SlideRender slide={cover} palette={deck.palette} dir={dir} />
+              </ScaledSlide>
+            </div>
+          ) : (
+            <div className="absolute inset-0" style={{ background: deck.palette.bg }} />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent pointer-events-none" />
-          <div className="absolute top-4 right-4 inline-flex items-center gap-1 rounded-full bg-background/50 backdrop-blur px-2.5 py-1 text-[11px] font-medium text-foreground opacity-0 group-hover:opacity-100 transition">
+          <div className="absolute top-2.5 end-2.5 inline-flex items-center gap-1 rounded-full bg-background/70 backdrop-blur px-2.5 py-1 text-[11px] font-medium text-foreground opacity-0 group-hover:opacity-100 transition">
             <Maximize2 className="w-3 h-3" /> Open
           </div>
         </button>
 
-        <div className="px-6 pb-6 pt-4 flex flex-col gap-3">
-          <button
-            onClick={() => {
-              setIdx(0);
-              openPreview();
-            }}
-              data-slides-preview-button
-            style={{ backgroundColor: "#ffffff", color: "#000000" }}
-            className="w-full flex items-center justify-center gap-2 py-3.5 font-semibold rounded-2xl transition-all hover:brightness-95 shadow-lg text-[14px] tracking-tight"
-          >
-            <Maximize2 className="w-4 h-4" />
-            Open in preview
-          </button>
+        <div className="px-4 pb-4 pt-3 flex flex-col gap-2.5">
+          <div className="flex items-center justify-between gap-2">
+            <span className="min-w-0 truncate text-sm font-semibold text-foreground">{deck.title}</span>
+            <span className="shrink-0 text-[11px] text-muted-foreground">
+              {total} {total === 1 ? "slide" : "slides"}
+            </span>
+          </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                setIdx(0);
+                openPreview();
+              }}
+              data-slides-preview-button
+              className="slides-card-button slides-card-button--accent flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium active:scale-[0.98]"
+            >
+              <Maximize2 className="w-4 h-4" />
+              Open
+            </button>
             <button
               onClick={handlePptx}
               disabled={exportingPptx}
-              className="flex-1 flex items-center justify-center gap-2 py-3 bg-zinc-900 text-zinc-400 hover:text-foreground font-medium rounded-2xl border border-foreground/5 transition-all hover:bg-zinc-800 disabled:opacity-50 text-[13px]"
+              className="slides-card-button slides-card-button--secondary flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium active:scale-[0.98] disabled:opacity-50"
             >
               {exportingPptx ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                <Download className="w-3.5 h-3.5" />
+                <Download className="w-4 h-4" />
               )}
-              PPTX
-            </button>
-            <button
-              onClick={handleHtml}
-              disabled={exportingHtml}
-              aria-label="HTML"
-              className="w-11 h-11 flex items-center justify-center bg-zinc-900 text-zinc-400 hover:text-foreground rounded-2xl border border-foreground/5 transition-all hover:bg-zinc-800 disabled:opacity-50"
-            >
-              {exportingHtml ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <FileCode2 className="w-4 h-4" />
-              )}
+              Download
             </button>
           </div>
         </div>
