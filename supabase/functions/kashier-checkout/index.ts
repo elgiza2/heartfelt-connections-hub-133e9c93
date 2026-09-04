@@ -97,6 +97,9 @@ Deno.serve(async (req) => {
 
   const siteUrl = Deno.env.get("SITE_URL") || "https://megsyai.com";
   const redirectUrl = `${siteUrl}/billing/success?provider=kashier&order=${encodeURIComponent(orderId)}`;
+  // Server-to-server notification: this is what actually credits the account,
+  // so a closed browser tab can never lose a paid order.
+  const serverWebhook = `${Deno.env.get("SUPABASE_URL")}/functions/v1/kashier-webhook`;
 
   const params = new URLSearchParams({
     merchantId,
@@ -106,6 +109,7 @@ Deno.serve(async (req) => {
     hash,
     mode: "live",
     merchantRedirect: redirectUrl,
+    serverWebhook,
     display,
     paymentRequestId: orderId,
     metaData: JSON.stringify({ sku, offer, user_id: user.id }),
@@ -113,6 +117,7 @@ Deno.serve(async (req) => {
     interactionSource: "ECommerce",
     allowedMethods: method === "wallet" ? "wallet" : "card",
   });
+
 
   const checkoutUrl = `https://checkout.kashier.io/?${params.toString()}`;
 
